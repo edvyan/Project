@@ -132,7 +132,7 @@ The document introduces a noval approach which simplifies the processing of exte
 - Use of BERT for text encoding.
 - Unsupervised clustering to group sections.
 
-## Main Findings
+### Main Findings
 - Evaluation using a dataset of British firms' annual reports.
 - Best model achieves a ROUGE-L score of 36%.
 
