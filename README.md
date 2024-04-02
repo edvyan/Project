@@ -99,3 +99,24 @@ Our aim is to develop a solution that simplifies this process by providing a per
 
 ## Conclusion
 This project aims to bridge the gap between vast financial data and actionable insights for users. By leveraging AI and NLP, the system will provide personalized, summarized, and insightful financial advice, catering to the needs of a diverse range of investors.
+
+
+
+# Summary of papers
+
+## 1. Prompted LLMs as Chatbot Modules for Long Open-domain Conversation (Edvin Yang)
+[Prompted LLMs as Chatbot Modules for Long Open-domain Conversation](https://aclanthology.org/2023.findings-acl.277) (Lee et al., Findings 2023)
+### Summary
+The document introduces a novel approach known as the Modular Prompted Chatbot (MPC) for developing high-quality conversational agents. This method leverages the capabilities of pre-trained large language models (LLMs) without requiring additional fine-tuning.
+
+### Key Components
+- **Modular Approach:** MPC utilizes pre-trained LLMs as individual modules, enhancing long-term consistency and flexibility in conversations.
+- **Innovative Techniques:** The system incorporates advanced techniques like few-shot prompting, chain-of-thought (CoT), and external memory to improve performance.
+
+### Main Findings
+- **Performance Comparison:** According to human evaluations, MPC performs comparably to fine-tuned chatbot models in open-domain conversations.
+- **Adaptability of Pre-trained LLMs:** The research emphasizes the ability of pre-trained LLMs to adapt to new tasks without the need for fine-tuning.
+
+### Significance
+The development of MPC underscores the importance of creating consistent and engaging chatbots for open-domain conversations, demonstrating the potential of using pre-trained LLMs in advanced conversational agents.
+
