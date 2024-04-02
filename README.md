@@ -69,19 +69,19 @@ Our aim is to develop a solution that simplifies this process by providing a per
 ## 5. Task Distribution
 ### Collaborative and Parallel Work Approach
 
-#### Team Member 1:
+#### Group 1:
 - **API Integration and Backend Development:**
   - Focus on integrating APIs for data collection.
   - Develop backend logic for data processing and storage.
   - Collaborate with Team Member 3 for data needs of insight generation.
 
-#### Team Member 2:
+#### Groupr 2:
 - **Front-End Development and User Experience:**
   - Design and implement the user interface.
   - Ensure seamless integration with the backend for data display.
   - Work closely with Team Member 1 for API integration on the front end.
 
-#### Team Member 3:
+#### Group 3:
 - **NLP and Insight Generation Algorithms:**
   - Develop NLP models for news summarization.
   - Create algorithms for generating insights from processed data.
