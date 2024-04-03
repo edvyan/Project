@@ -69,19 +69,19 @@ Our aim is to develop a solution that simplifies this process by providing a per
 ## 5. Task Distribution
 ### Collaborative and Parallel Work Approach
 
-#### Group 1:
+#### Edvin and Tairo
 - **API Integration and Backend Development:**
   - Focus on integrating APIs for data collection.
   - Develop backend logic for data processing and storage.
   - Collaborate with Team Member 3 for data needs of insight generation.
 
-#### Groupr 2:
+#### Sunil
 - **Front-End Development and User Experience:**
   - Design and implement the user interface.
   - Ensure seamless integration with the backend for data display.
   - Work closely with Team Member 1 for API integration on the front end.
 
-#### Group 3:
+#### Nitesh and Stabya
 - **NLP and Insight Generation Algorithms:**
   - Develop NLP models for news summarization.
   - Create algorithms for generating insights from processed data.
@@ -204,6 +204,27 @@ Finally, the researchers compared their approach with different baselines includ
 Different models and strategies were compared  and it was found that when more labels (or data) are used for training, models produce better summaries. However, this improvement was not so noticeable in WikiHow and ArXiv/PubMed datasets because the model's labels were created using a matching technique that might not be the best way to create labels.
 Among the semi-supervised models (which learn from both labelled and unlabeled data), all selection strategies they tested did better than a model trained with random pseudolabels (artificial labels). They observed that using GPT-4 to rate pseudolabels improved the performance for all datasets, suggesting that the summarization model can generate some high-quality labels and that GPT-4 is beneficial for determining those high-quality labels.
 It was concluded that the performance of their model, PreSumm, aligns poorly with the actual distribution of the data, possibly due to having only a small labelled dataset. Hence, depending on GPT-4 to rate generated pseudolabels can be a beneficial strategy, especially in situations where there is little labelled data available.
+
+
+## 5. Comparative Analysis of Business Machine Learning in Making Effective Financial Decisions Using Structural Equation Model (SEM) 
+The research paper titled "Comparative Analysis of Business Machine Learning in Effective Financial Decision Making Using Structural Equation Model (SEM)" explores the role of machine learning (ML) in improving financial decision making in organization s It focuses on ML strategies used in various economies, including risk management, forecasting, and customer communications, focusing on the potential for reducing costs, improving efficiency, and improving decision-making
+
+The article focuses on ML in finance, particularly in algorithmic trading, risk management, and process automation. The ML algorithm generates customized reports based on available data, enabling fast and informed decision making. The study also includes the use of natural language processing (NLP) to analyze and integrate large amounts of data for market research purposes. ML is seen as a valuable tool for analyzing economic data, forecasting market trends, and supporting decision making in areas such as regression analysis and classification
+
+Overall, the research article highlights the important role of machine learning in investment decision-making. It uses ML to optimize business processes, manage risks, and connect customers more effectively. By leveraging large amounts of data, ML enables organizations to make informed decisions, reduce costs, and improve overall financial performance.
+
+## 6 
+
+
+
+
+
+
+
+
+## References
+Sujith, A.V.L.N. et al. (2022) A comparative analysis of business machine learning in making effective financial decisions using structural equation model (SEM), Journal of Food Quality. Available at: https://www.hindawi.com/journals/jfq/2022/6382839/ (Accessed: 03 April 2024). 
+
 
 
 
