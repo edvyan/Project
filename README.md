@@ -213,17 +213,23 @@ The article focuses on ML in finance, particularly in algorithmic trading, risk 
 
 Overall, the research article highlights the important role of machine learning in investment decision-making. It uses ML to optimize business processes, manage risks, and connect customers more effectively. By leveraging large amounts of data, ML enables organizations to make informed decisions, reduce costs, and improve overall financial performance.
 
-## 6 
+## 6 Summarization and Sentiment Analysis for Financial News
+The paper titled "Summarization and Sentiment Analysis for Financial News" provides a technique to system economic news articles and offer customers with a concise summary and a fundamental sentiment evaluation. The proposed device takes enter inside the shape of a corporation name or image and fetches relevant news articles using web scraping. The articles are then summarized to extract crucial facts, and an basic sentiment approximately the organisation is determined based totally on key features within the article.
 
+The document outlines five principal modules involved in the manner: enter and query processing, information preprocessing, storage, sentiment analysis, and summarization. The input and query processing module fetches news articles from dependable on-line assets through web scraping. Data preprocessing includes getting rid of noise, together with punctuation and numbers, and tokenizing the textual content. The preprocessed information is then saved in a database for destiny use.
 
+Sentiment evaluation is performed with the aid of categorizing critiques and feelings conveyed within the article and figuring out the tone as fantastic, terrible, or neutral. The sentiment analysis is accomplished previous to summarization, the use of a single lexicon method and cosine similarity to evaluate the article's key phrases with superb and bad word lists.
 
+For summarization, an extractive method is used, in which the Text Rank algorithm ranks sentences based on their significance. The top five-7 sentences are selected to shape the summary of the article. The overall performance of the system is evaluated the usage of the ROUGE metric, which compares the gadget-generated summary with human-generated summaries.
 
-
-
+Overall, the report affords a way for summarizing financial news articles and providing a basic sentiment analysis, aiming to help users quickly obtain relevant statistics and apprehend the general sentiment portrayed by using the articles.
 
 
 ## References
-Sujith, A.V.L.N. et al. (2022) A comparative analysis of business machine learning in making effective financial decisions using structural equation model (SEM), Journal of Food Quality. Available at: https://www.hindawi.com/journals/jfq/2022/6382839/ (Accessed: 03 April 2024). 
+
+1. Sujith, A.V.L.N. et al. (2022) A comparative analysis of business machine learning in making effective financial decisions using structural equation model (SEM), Journal of Food Quality. Available at: https://www.hindawi.com/journals/jfq/2022/6382839/ (Accessed: 03 April 2024). 
+
+2. Publication, I. (2022) Summarization and sentiment analysis for Financial News, IJRASET. Available at: https://www.academia.edu/67504420/Summarization_and_Sentiment_Analysis_for_Financial_News (Accessed: 03 April 2024). 
 
 
 
