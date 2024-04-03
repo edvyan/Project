@@ -225,14 +225,14 @@ For summarization, an extractive method is used, in which the Text Rank algorith
 Overall, the report affords a way for summarizing financial news articles and providing a basic sentiment analysis, aiming to help users quickly obtain relevant statistics and apprehend the general sentiment portrayed by using the articles.
 
 
-## References
+## References and Summarization
 
 1. Sujith, A.V.L.N. et al. (2022) A comparative analysis of business machine learning in making effective financial decisions using structural equation model (SEM), Journal of Food Quality. Available at: https://www.hindawi.com/journals/jfq/2022/6382839/ (Accessed: 03 April 2024). 
 
 2. Publication, I. (2022) Summarization and sentiment analysis for Financial News, IJRASET. Available at: https://www.academia.edu/67504420/Summarization_and_Sentiment_Analysis_for_Financial_News (Accessed: 03 April 2024). 
 
 
-
+### 
 
 
 
