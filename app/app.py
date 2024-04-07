@@ -7,7 +7,7 @@ app = dash.Dash(__name__)
 
 # App layout
 app.layout = html.Div([
-    html.H1("Stock Information Dashboard", style={'text-align': 'center'}),
+    html.H1("Stock Info Lookup", style={'text-align': 'center'}),
     dcc.Input(
         id='input-ticker', 
         type='text', 
