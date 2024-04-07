@@ -7,7 +7,7 @@ app = dash.Dash(__name__)
 
 # App layout
 app.layout = html.Div([
-    html.H1("Stock Info Lookup", style={'text-align': 'center'}),
+    html.H1("Stock Information Lookup", style={'text-align': 'center'}),
     dcc.Input(
         id='input-ticker', 
         type='text', 
@@ -31,27 +31,50 @@ app.layout = html.Div([
     [State('input-ticker', 'value')]
 )
 def update_output(n_clicks, n_submit, ticker):
-    # Check if the button was clicked or enter key was pressed
     if n_clicks > 0 or n_submit > 0:
         if ticker:
             ticker = ticker.strip().upper()
-            url = f'https://www.alphavantage.co/query?function=TOP_GAINERS_LOSERS&apikey=YOUR_API_KEY'
+            url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey=YOUR_API_KEY'
             response = requests.get(url)
             data = response.json()
 
-            categories = ['top_gainers', 'top_losers', 'most_actively_traded']
-            for category in categories:
-                for stock in data[category]:
-                    if stock['ticker'] == ticker:
-                        return html.Div([
-                            html.H3(f"{category.replace('_', ' ').title()} - {stock['ticker']}"),
-                            html.P(f"Price: {stock['price']}"),
-                            html.P(f"Change Amount: {stock['change_amount']}"),
-                            html.P(f"Change Percentage: {stock['change_percentage']}"),
-                            html.P(f"Volume: {stock['volume']}")
-                        ], style={'border': '1px solid #ddd', 'padding': '15px', 'border-radius': '5px', 'background-color': '#f9f9f9'})
+            try:
+                daily_data = data['Time Series (Daily)']
+                recent_dates = sorted(daily_data.keys(), reverse=True)[:7]  # Last 7 days
 
-    return 'Enter a ticker!'
+                def calculate_change(previous, current):
+                    return round(current - previous, 2), round((current - previous) / previous * 100, 2)
+
+                historical_info = []
+                for i, date in enumerate(recent_dates):
+                    close_price = float(daily_data[date]['4. close'])
+                    volume = daily_data[date]['5. volume']
+
+                    if i < len(recent_dates) - 1:
+                        prev_close = float(daily_data[recent_dates[i + 1]]['4. close'])
+                        change_amt, change_pct = calculate_change(prev_close, close_price)
+                    else:
+                        change_amt, change_pct = 0, 0
+
+                    historical_info.append({
+                        "date": date,
+                        "close_price": close_price,
+                        "change_amount": change_amt,
+                        "change_percentage": change_pct,
+                        "volume": volume
+                    })
+
+                return html.Div([
+                    html.H3(f"Stock Data for {ticker} - Last 7 Days"),
+                    html.Table([
+                        html.Thead(html.Tr([html.Th("Date", style={'padding': '0 15px', 'text-align': 'left'}), html.Th("Price", style={'padding': '0 15px', 'text-align': 'left'}), html.Th("Change Amt", style={'padding': '0 15px', 'text-align': 'left'}), html.Th("Change %", style={'padding': '0 15px', 'text-align': 'left'}), html.Th("Volume", style={'padding': '0 15px', 'text-align': 'left'})])),
+                        html.Tbody([html.Tr([html.Td(info["date"], style={'padding': '0 15px', 'text-align': 'left'}), html.Td(info["close_price"], style={'padding': '0 15px', 'text-align': 'left'}), html.Td(info["change_amount"], style={'padding': '0 15px', 'text-align': 'left'}), html.Td(f"{info['change_percentage']}%", style={'padding': '0 15px', 'text-align': 'left'}), html.Td(info["volume"], style={'padding': '0 15px', 'text-align': 'left'})]) for info in historical_info])
+                    ], style={'margin-left': 'auto', 'margin-right': 'auto', 'border-collapse': 'collapse'})
+                ], style={'text-align': 'center', 'padding': '15px', 'border-radius': '5px', 'background-color': '#f9f9f9', 'width': '80%', 'margin': 'auto'})
+            except KeyError:
+                return 'Stock data not available or invalid ticker symbol entered.'
+
+    return 'Enter a ticker and click the button or press Enter.'
 
 # Run the app
 if __name__ == '__main__':
