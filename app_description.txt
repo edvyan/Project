@@ -1,0 +1,24 @@
+Here is App description, UI mockup shall be attached in seperate file. 
+
+1. Use stock API to retrive stock info of the past 7 days, realization: input stock name and show stock info (stock name, price, change, volume, etc)  
+2. Use financial news API to retrive stock news of the past 7 days, realization: input stock name and show news info. 
+3. Implement NLP model to achieve Natural Language Querying, realization: parse natural language, extract stock name and fetch info. 
+4. Implement NLP model to summarize news 
+5. Implement NLP model to make sentiment analysis (optional) 
+
+Expected interface functionalities: 
+Input: Please show me some information of apple. / Can you show me apple stock. / Apple / Tim cook / iphone stock
+Output: Certainly, below you can find apple stock performace of the past 7 days: 
+Stock Data for AAPL - Last 7 Days
+Date	Price	Change Amt	Change %	Volume
+2024-04-05	169.58	0.76	0.45%	41975776
+2024-04-04	168.82	-0.83	-0.49%	53355055
+2024-04-03	169.65	0.81	0.48%	45571129
+2024-04-02	168.84	-1.19	-0.7%	49013991
+2024-04-01	170.03	-1.45	-0.85%	43772506
+2024-03-28	171.48	-1.83	-1.06%	65672690
+2024-03-27	173.31	0	0%	60273265
+
+News summary of Apple in the past 7 days: 
+2024-04-05 Bloomberg, apple has decided to launch iphone 16 in the thrid quarter of this this year. 
+2024-04-02 Yahoo Finance, Tim Cook visited Shanghai to open new store. 
