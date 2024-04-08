@@ -4,7 +4,7 @@ Here is App description, UI mockup shall be attached in seperate file.
 2. Use financial news API to retrive stock news of the past 7 days, realization: input stock name and show news info. 
 3. Implement NLP model to achieve Natural Language Querying, realization: parse natural language, extract stock name and fetch info. 
 4. Implement NLP model to summarize news 
-5. Implement NLP model to make sentiment analysis (optional) 
+5. Implement NLP model to make sentiment analysis to give advice
 
 Expected interface functionalities: 
 Input: Please show me some information of apple. / Can you show me apple stock. / Apple / Tim cook / iphone stock
