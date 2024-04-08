@@ -20,5 +20,5 @@ Date	Price	Change Amt	Change %	Volume
 2024-03-27	173.31	0	0%	60273265
 
 News summary of Apple in the past 7 days: 
-2024-04-05 Bloomberg, apple has decided to launch iphone 16 in the thrid quarter of this this year. 
+2024-04-05 Bloomberg, apple has decided to launch iphone 16 in the thrid quarter in this year. 
 2024-04-02 Yahoo Finance, Tim Cook visited Shanghai to open new store. 
