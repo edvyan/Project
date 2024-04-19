@@ -1,18 +1,19 @@
-import dash
-from dash import html, dcc, Output, Input, State
+from dash import Dash, html, dcc, Input, Output, State, ClientsideFunction, callback_context
+import dash_bootstrap_components as dbc
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk import pos_tag
 import requests
+
 import pandas as pd
-from transformers import AutoModelForTokenClassification, AutoTokenizer
-import torch
 import re
-import warnings
-import logging
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+import torch
+from fuzzywuzzy import process
 
-# Suppress warnings
-warnings.filterwarnings("ignore", message="torch.utils._pytree._register_pytree_node is deprecated")
-warnings.filterwarnings("ignore", message="Some weights of the model checkpoint at")
-
-logging.getLogger('werkzeug').setLevel(logging.ERROR)
+# Ensure NLTK resources are downloaded
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 
 # Load CSV file and process data
 df_stocks = pd.read_csv('stock.csv')
@@ -22,7 +23,6 @@ df_stocks['Normalized Company Name'] = df_stocks['Company Name'].str.lower().rep
 model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForTokenClassification.from_pretrained(model_name)
-
 
 def extract_company_names(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
@@ -64,56 +64,14 @@ def extract_company_names(text):
 def map_entities_to_tickers(entities, df_stocks):
     entity_ticker_map = {}
     for entity in entities:
-        normalized_entity = entity.lower().replace('[^a-zA-Z0-9]', '')
-        pattern = r'\b' + re.escape(normalized_entity) + r'\b'
-        matched_row = df_stocks[df_stocks['Normalized Company Name'].str.contains(pattern, regex=True, na=False)]
-        if not matched_row.empty:
+        # Fuzzy matching to find the closest company name in the dataframe
+        closest_match, score = process.extractOne(entity, df_stocks['Normalized Company Name'].tolist())
+        if score > 85:  # Only accept matches above a certain confidence level
+            matched_row = df_stocks[df_stocks['Normalized Company Name'] == closest_match]
             entity_ticker_map[entity] = matched_row.iloc[0]['Symbol']
         else:
             entity_ticker_map[entity] = "Ticker not found"
     return entity_ticker_map
-
-
-# Initialize Dash
-app = dash.Dash(__name__)
-
-# App layout
-app.layout = html.Div([
-    html.H1("Stock Information Lookup", style={'text-align': 'center'}),
-    dcc.Input(
-        id='input-text', 
-        type='text', 
-        placeholder='e.g., "Show info on Apple"',
-        style={'width': '100%', 'padding': '10px', 'margin': '10px'}
-    ),
-    html.Button(
-        'Get Stock Info', 
-        id='button-submit', 
-        n_clicks=0,
-        style={'padding': '10px', 'margin': '10px'}
-    ),
-    html.Div(id='container-output', style={'margin': '20px', 'padding': '10px'})
-], style={'text-align': 'center', 'font-family': 'Arial, sans-serif'})
-
-# Callback for updating stock info
-@app.callback(
-    Output('container-output', 'children'),
-    Input('button-submit', 'n_clicks'),
-    State('input-text', 'value')
-)
-def update_output(n_clicks, text):
-    if n_clicks > 0 and text:
-        companies = extract_company_names(text)
-        tickers = map_entities_to_tickers(companies, df_stocks)
-        results = []
-        for company, ticker in tickers.items():
-            if ticker != "Ticker not found":
-                results.append(fetch_stock_data(ticker))
-        if results:
-            return html.Div(results)
-        else:
-            return html.Div("No valid stock tickers found from input.")
-    return "Enter a query and click submit."
 
 def fetch_stock_data(ticker):
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey=YOUR_API_KEY'
@@ -123,18 +81,138 @@ def fetch_stock_data(ticker):
     try:
         daily_data = data['Time Series (Daily)']
         recent_dates = sorted(daily_data.keys(), reverse=True)[:7]  # Last 7 days
-        historical_info = []
+
+        # Prepare headers for the markdown table
+        markdown_table = "Bingo! Here is the stock data for {} of the last 7 Days\n".format(ticker)
+        markdown_table += "| Date       | Close  | Change Amt | Change % | Volume     |\n"
+        markdown_table += "|------------|--------|------------|----------|------------|\n"
+
+        # Retrieve the previous day's data for change calculations
+        prev_close = None
         for date in recent_dates:
             close_price = float(daily_data[date]['4. close'])
             volume = daily_data[date]['5. volume']
-            historical_info.append(f"Date: {date}, Close: {close_price}, Volume: {volume}")
+            if prev_close is not None:
+                change_amt = close_price - prev_close
+                change_pct = (change_amt / prev_close) * 100
+            else:
+                change_amt = 0
+                change_pct = 0
+            markdown_table += "| {} | {:.2f} | {:.2f} | {:.2f}% | {} |\n".format(
+                date, close_price, change_amt, change_pct, volume)
+            prev_close = close_price
 
-        return html.Div([
-            html.H3(f"Stock Data for {ticker} - Last 7 Days"),
-            html.Ul([html.Li(info) for info in historical_info])
-        ])
+        return markdown_table
     except KeyError:
         return f'Stock data not available for {ticker}.'
 
+# Note: You need to adjust your callback to render this Markdown appropriately.
+
+
+# Create the Dash application
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+# Define the initial message from the chatbot
+initial_bot_greeting = "Hello! I'm your financial advisor. How can I assist you today?\n"
+
+# Define the layout with all components including the dummy div for the callback output
+app.layout = dbc.Container([
+    dbc.Row(html.H2("Financial advisor")),
+    dbc.Row(
+        dcc.Textarea(
+            id='chat-area',
+            value=initial_bot_greeting,
+            style={'width': '100%', 'height': '800px', 'overflowY': 'auto'},
+            readOnly=True
+        )
+    ),
+    dbc.Row(
+        [
+            dcc.Input(
+                id='user-input',
+                type='text',
+                placeholder='Type a message...',
+                style={'width': '90%', 'height': '50px'},
+                n_submit=0,
+                value=''
+            ),
+            html.Button('Send', id='send-button', n_clicks=0, style={'height': '50px', 'width': '10%'}),
+        ]
+    ),
+    html.Div(id='company-context', style={'display': 'none'}),
+    html.Div(id='ticker-context', style={'display': 'none'}),
+    html.Div(id='dummy-div', style={'display': 'none'})  # Dummy div for the clientside callback
+], fluid=True)
+
+
+# Define the clientside callback
+app.clientside_callback(
+    ClientsideFunction(
+        namespace='clientside',
+        function_name='scrollToBottom'
+    ),
+    output=Output('dummy-div', 'children'),  # Using the dummy div for output
+    inputs=[Input('chat-area', 'value')]
+)
+
+
+@app.callback(
+    [Output('chat-area', 'value'), Output('user-input', 'value'), 
+     Output('company-context', 'children'), Output('ticker-context', 'children')],
+    [Input('send-button', 'n_clicks'), Input('user-input', 'n_submit')],
+    [State('user-input', 'value'), State('chat-area', 'value'),
+     State('company-context', 'children'), State('ticker-context', 'children')]
+)
+# Assuming you already have the entities extraction and mapping functions defined above
+def update_output(n_clicks, n_submit, input_value, chat_value, company_context, ticker_context):
+    triggered_id = callback_context.triggered[0]['prop_id'].split('.')[0]
+    input_value = input_value.strip()
+
+    if not input_value:
+        return chat_value, '', company_context, ticker_context
+
+    if company_context and input_value.lower() in ['y', 'n']:
+        if input_value.lower() == 'y':
+            # Fetch stock data
+            stock_info = fetch_stock_data(ticker_context)
+            return f"{chat_value}Chatbot: {stock_info}\n", '', None, None
+        else:
+            return f"{chat_value}Chatbot: Please specify the company name!\n", '', None, None
+
+    # Look for company information or handle general queries
+    general_response = get_response(input_value)
+    if general_response != "Can you please rephrase that?":
+        return f"{chat_value}User: {input_value}\nChatbot: {general_response}\n", '', None, None
+
+    entities = extract_company_names(input_value)
+    if entities:
+        entity_ticker_map = map_entities_to_tickers(entities, df_stocks)
+        if entity_ticker_map:
+            first_entity = list(entity_ticker_map.keys())[0]
+            first_ticker = entity_ticker_map[first_entity]
+            response = f"Chatbot: Do you mean {first_entity}: {first_ticker} (y/n)?\n"
+            return f"{chat_value}User: {input_value}\n{response}", '', first_entity, first_ticker
+
+    response = "Chatbot: Can't find the company, please rephrase.\n"
+    return f"{chat_value}User: {input_value}\n{response}", '', None, None
+
+def get_response(user_input):
+    user_input = user_input.lower()
+    tokens = word_tokenize(user_input)
+
+    # Use regex for basic pattern matching for general conversation
+    if re.search(r"\b(hello|hi|hey)\b", user_input):
+        return "Hello! How can I assist you today?"
+    if re.search(r"\bhow are you\b", user_input):
+        return "I'm just a bot, but thanks for asking! How can I assist you today?"
+    if re.search(r"\bhelp\b", user_input):
+        return "Sure, what do you need help with?"
+    if re.search(r"\b(name|who are you)\b", user_input):
+        return "I'm ChatBot, your virtual assistant. How can I help you today?"
+
+    # If no patterns match, ask for clarification
+    return "Can you please rephrase that?"
+
+# Run the server
 if __name__ == '__main__':
     app.run_server(debug=True)
