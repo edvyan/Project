@@ -11,7 +11,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 import torch
 from fuzzywuzzy import process
 
-# Ensure NLTK resources are downloaded
+# NLTK download
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
@@ -64,7 +64,6 @@ def extract_company_names(text):
 def map_entities_to_tickers(entities, df_stocks):
     entity_ticker_map = {}
     for entity in entities:
-        # Fuzzy matching to find the closest company name in the dataframe
         closest_match, score = process.extractOne(entity, df_stocks['Normalized Company Name'].tolist())
         if score > 85:  # Only accept matches above a certain confidence level
             matched_row = df_stocks[df_stocks['Normalized Company Name'] == closest_match]
@@ -106,7 +105,6 @@ def fetch_stock_data(ticker):
     except KeyError:
         return f'Stock data not available for {ticker}.'
 
-# Note: You need to adjust your callback to render this Markdown appropriately.
 
 
 # Create the Dash application
@@ -115,7 +113,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 # Define the initial message from the chatbot
 initial_bot_greeting = "Hello! I'm your financial advisor. How can I assist you today?\n"
 
-# Define the layout with all components including the dummy div for the callback output
+# Define the layout
 app.layout = dbc.Container([
     dbc.Row(html.H2("Financial advisor")),
     dbc.Row(
@@ -141,7 +139,7 @@ app.layout = dbc.Container([
     ),
     html.Div(id='company-context', style={'display': 'none'}),
     html.Div(id='ticker-context', style={'display': 'none'}),
-    html.Div(id='dummy-div', style={'display': 'none'})  # Dummy div for the clientside callback
+    html.Div(id='dummy-div', style={'display': 'none'}) 
 ], fluid=True)
 
 
@@ -151,7 +149,7 @@ app.clientside_callback(
         namespace='clientside',
         function_name='scrollToBottom'
     ),
-    output=Output('dummy-div', 'children'),  # Using the dummy div for output
+    output=Output('dummy-div', 'children'), 
     inputs=[Input('chat-area', 'value')]
 )
 
@@ -163,7 +161,8 @@ app.clientside_callback(
     [State('user-input', 'value'), State('chat-area', 'value'),
      State('company-context', 'children'), State('ticker-context', 'children')]
 )
-# Assuming you already have the entities extraction and mapping functions defined above
+
+#update output
 def update_output(n_clicks, n_submit, input_value, chat_value, company_context, ticker_context):
     triggered_id = callback_context.triggered[0]['prop_id'].split('.')[0]
     input_value = input_value.strip()
