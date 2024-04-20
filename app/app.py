@@ -7,22 +7,35 @@ import requests
 
 import pandas as pd
 import re
-from transformers import AutoTokenizer, AutoModelForTokenClassification
+from transformers import AutoTokenizer, AutoModelForTokenClassification, AutoModelForSeq2SeqLM
 import torch
 from fuzzywuzzy import process
 
-# NLTK download
+# Ensure NLTK resources are downloaded
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
 # Load CSV file and process data
-df_stocks = pd.read_csv('stock.csv')
+df_stocks = pd.read_csv('../data/stock.csv')
 df_stocks['Normalized Company Name'] = df_stocks['Company Name'].str.lower().replace('[^a-zA-Z0-9 ]', '', regex=True)
 
 # Load NER model
 model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForTokenClassification.from_pretrained(model_name)
+
+# Load the model and tokenizer
+model_path = './model/distilbart-cnn-12-6'
+tokenizer2 = AutoTokenizer.from_pretrained(model_path)
+model2 = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+
+
+def summarize_text(text):
+    inputs = tokenizer2(text, return_tensors="pt", max_length=1024, truncation=True)
+    summary_ids = model2.generate(inputs['input_ids'], max_length=150, min_length=80, length_penalty=5., num_beams=2)
+    summary = tokenizer2.decode(summary_ids[0], skip_special_tokens=True)
+    return summary
+
 
 def extract_company_names(text):
     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
@@ -64,6 +77,7 @@ def extract_company_names(text):
 def map_entities_to_tickers(entities, df_stocks):
     entity_ticker_map = {}
     for entity in entities:
+        # Fuzzy matching to find the closest company name in the dataframe
         closest_match, score = process.extractOne(entity, df_stocks['Normalized Company Name'].tolist())
         if score > 85:  # Only accept matches above a certain confidence level
             matched_row = df_stocks[df_stocks['Normalized Company Name'] == closest_match]
@@ -105,7 +119,20 @@ def fetch_stock_data(ticker):
     except KeyError:
         return f'Stock data not available for {ticker}.'
 
+def fetch_and_summarize_news(company):
+    api_key = "c347856255d54313bb339a8b8f69879f"
+    url = f"https://newsapi.org/v2/everything?q={company}&apiKey={api_key}"
+    response = requests.get(url)
+    data = response.json()
 
+    if 'articles' in data:
+        summaries = []
+        for article in data['articles'][:7]:  # Limit to 7 articles
+            summary = summarize_text(article['content']) if article['content'] else "No content to summarize."
+            summaries.append(f"{article['publishedAt'][:10]}: {summary}")
+        return "\n".join(summaries)
+    else:
+        return "Failed to fetch news or no news available."
 
 # Create the Dash application
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -113,7 +140,7 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 # Define the initial message from the chatbot
 initial_bot_greeting = "Hello! I'm your financial advisor. How can I assist you today?\n"
 
-# Define the layout
+# Define the layout with all components including the dummy div for the callback output
 app.layout = dbc.Container([
     dbc.Row(html.H2("Financial advisor")),
     dbc.Row(
@@ -139,7 +166,7 @@ app.layout = dbc.Container([
     ),
     html.Div(id='company-context', style={'display': 'none'}),
     html.Div(id='ticker-context', style={'display': 'none'}),
-    html.Div(id='dummy-div', style={'display': 'none'}) 
+    html.Div(id='dummy-div', style={'display': 'none'})  # Dummy div for the clientside callback
 ], fluid=True)
 
 
@@ -149,7 +176,7 @@ app.clientside_callback(
         namespace='clientside',
         function_name='scrollToBottom'
     ),
-    output=Output('dummy-div', 'children'), 
+    output=Output('dummy-div', 'children'),  # Using the dummy div for output
     inputs=[Input('chat-area', 'value')]
 )
 
@@ -161,8 +188,7 @@ app.clientside_callback(
     [State('user-input', 'value'), State('chat-area', 'value'),
      State('company-context', 'children'), State('ticker-context', 'children')]
 )
-
-#update output
+# Assuming you already have the entities extraction and mapping functions defined above
 def update_output(n_clicks, n_submit, input_value, chat_value, company_context, ticker_context):
     triggered_id = callback_context.triggered[0]['prop_id'].split('.')[0]
     input_value = input_value.strip()
