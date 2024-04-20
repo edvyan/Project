@@ -25,7 +25,7 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForTokenClassification.from_pretrained(model_name)
 
 # Load the model and tokenizer
-model_path = './model/distilbart-cnn-12-6'
+model_path = '../model/distilbart-cnn-12-6'
 tokenizer2 = AutoTokenizer.from_pretrained(model_path)
 model2 = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 
