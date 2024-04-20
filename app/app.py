@@ -16,7 +16,8 @@ nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
 # Load CSV file and process data
-df_stocks = pd.read_csv('../data/stock.csv')
+# df_stocks = pd.read_csv('../data/stock.csv')
+df_stocks = pd.read_csv('data/stock.csv') #Tairo revised
 df_stocks['Normalized Company Name'] = df_stocks['Company Name'].str.lower().replace('[^a-zA-Z0-9 ]', '', regex=True)
 
 # Load NER model
@@ -25,7 +26,8 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForTokenClassification.from_pretrained(model_name)
 
 # Load the model and tokenizer
-model_path = '../model/distilbart-cnn-12-6'
+# model_path = '../model/distilbart-cnn-12-6'
+model_path = 'sshleifer/distilbart-cnn-12-6' # Tairo revised
 tokenizer2 = AutoTokenizer.from_pretrained(model_path)
 model2 = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 
