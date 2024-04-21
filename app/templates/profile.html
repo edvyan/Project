@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% assets "profile" %}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+</head>
+<body>
+    <div class="nav-bar bg-primary">
+        <h3><a href="{{ url_for('index')}}">Chat Advisor</a></h3>
+        <div class="option">
+            <a>Profile</a>
+            <a>Log Out</a>
+        </div>
+    </div>
+    <div class="content">
+        <form action="/signup" method="post" class="card">
+            <h3>Profile</h3>
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" id="firstname" name="firstname" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" id="lastname" name="lastname" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+            <input type="email" id="email" name="email" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="form-control">
+            </div>
+            <button type="submit" value="Signup" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+</body>
+</html>

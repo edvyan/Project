@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% assets "dashboard" %}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+</head>
+<body>
+    <div class="nav-bar bg-primary">
+        <h3>Chat Advisor</h3>
+        <div class="option">
+            <a href="{{ url_for('profile') }}">Profile</a>
+            <a>Log Out</a>
+        </div>
+    </div>
+    <div class="content">
+        <div class="chat-container">
+            <div class="card">
+                <h5>Talk with the bot!</h5>
+                <div class="card-body">
+                    <div class="chat-messages">
+                        {% for message in chat_messages %}
+                            {% if message.sender == 'user' %}
+                            <div class="message message__user">{{ message.message }}</div>
+                            {% else %}
+                            <div class="message message__bot">{{ message.message }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <form action="/" method="POST">
+                        <input type="text" id="query" name="query" required>
+                        <button class="btn btn-primary">Send</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card stocks-container">
+            <h5>Your Stocks Review:</h5>
+            <div class="card-body">
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

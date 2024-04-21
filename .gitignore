@@ -1,1 +1,4 @@
 app/__pycache__
+app/instance
+app/static/.webassets-cache
+app/static/gen

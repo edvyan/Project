@@ -16,7 +16,7 @@ finbert_model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/fin
 
 
 # distilbart-cnn-12-6 for summarization
-model_path = '../model/distilbart-cnn-12-6'
+model_path = 'sshleifer/distilbart-cnn-12-6'
 tokenizer2 = AutoTokenizer.from_pretrained(model_path)
 model2 = AutoModelForSeq2SeqLM.from_pretrained(model_path)
 
