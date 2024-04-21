@@ -16,4 +16,4 @@ With the Dash app open in your browser, you can now start interacting with the c
 
 ### App Interface
 Below is a screenshot of what the app interface looks like:
-![image](https://github.com/edvyan/Project/assets/46171741/179296af-2fda-4ce3-8aa7-53854dbddf60)
+![image](https://github.com/edvyan/Project/assets/46171741/9f9d1c5a-9a92-4226-a225-d2405da3c7fd)
