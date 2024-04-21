@@ -1,5 +1,8 @@
 ## Running the Dash Application
 
+### Install all the required packages using the command:
+`pip install -r requirements.txt`
+
 Follow these steps to run the Dash application locally on your machine:
 
 ### Step 1: Navigate to the app Folder
