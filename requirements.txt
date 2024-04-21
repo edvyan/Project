@@ -1,6 +1,9 @@
 dash
 dash-bootstrap-components
 flask
+lask_sqlalchemy
+flask_bootstrap
+flask_assets
 fuzzywuzzy
 nltk
 numpy
