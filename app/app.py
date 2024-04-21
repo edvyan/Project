@@ -19,46 +19,46 @@ df_stocks = pd.read_csv('stock.csv')
 df_stocks['Normalized Company Name'] = df_stocks['Company Name'].str.lower().replace('[^a-zA-Z0-9 ]', '', regex=True)
 
 # Load NER model
-model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForTokenClassification.from_pretrained(model_name)
+# model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
+# model = AutoModelForTokenClassification.from_pretrained(model_name)
 
 
-def extract_company_names(text):
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
-    outputs = model(**inputs)
-    predictions = torch.argmax(outputs.logits, dim=2)
+# def extract_company_names(text):
+#     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+#     outputs = model(**inputs)
+#     predictions = torch.argmax(outputs.logits, dim=2)
 
-    # Convert tokens to string
-    tokens = tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
-    entities = []
-    current_entity = []
+#     # Convert tokens to string
+#     tokens = tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
+#     entities = []
+#     current_entity = []
 
-    # Convert prediction indices to labels
-    prediction_labels = [model.config.id2label[prediction] for prediction in predictions[0].numpy()]
+#     # Convert prediction indices to labels
+#     prediction_labels = [model.config.id2label[prediction] for prediction in predictions[0].numpy()]
 
-    # Entity reconstruction
-    for token, label in zip(tokens, prediction_labels):
-        if label == "B-ORG":  
-            if current_entity:  # save the previous entity if it exists
-                entities.append(" ".join(current_entity))
-            current_entity = [token.replace("##", "")]
-        elif label == "I-ORG":  
-            if current_entity:
-                if token.startswith("##"):
-                    current_entity[-1] += token.replace("##", "")
-                else:
-                    current_entity.append(token)
-            else:
-                current_entity = [token.replace("##", "")]
-        elif current_entity:  # Outside an entity
-            entities.append(" ".join(current_entity))
-            current_entity = []
+#     # Entity reconstruction
+#     for token, label in zip(tokens, prediction_labels):
+#         if label == "B-ORG":  
+#             if current_entity:  # save the previous entity if it exists
+#                 entities.append(" ".join(current_entity))
+#             current_entity = [token.replace("##", "")]
+#         elif label == "I-ORG":  
+#             if current_entity:
+#                 if token.startswith("##"):
+#                     current_entity[-1] += token.replace("##", "")
+#                 else:
+#                     current_entity.append(token)
+#             else:
+#                 current_entity = [token.replace("##", "")]
+#         elif current_entity:  # Outside an entity
+#             entities.append(" ".join(current_entity))
+#             current_entity = []
 
-    if current_entity:
-        entities.append(" ".join(current_entity))
+#     if current_entity:
+#         entities.append(" ".join(current_entity))
 
-    return list(set(entities))  # return unique entities
+#     return list(set(entities))  # return unique entities
 
 
 def map_entities_to_tickers(entities, df_stocks):
