@@ -1,0 +1,11 @@
+dash
+dash-bootstrap-components
+flask
+fuzzywuzzy
+nltk
+numpy
+pandas
+requests
+transformers
+torch
+torchvision
