@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Dashboard</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     {% assets "dashboard" %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
@@ -14,7 +14,7 @@
         <h3>Chat Advisor</h3>
         <div class="option">
             <a href="{{ url_for('profile') }}">Profile</a>
-            <a>Log Out</a>
+            <a href="{{ url_for('logout') }}">Log Out</a>
         </div>
     </div>
     <div class="content">

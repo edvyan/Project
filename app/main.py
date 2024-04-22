@@ -99,6 +99,8 @@ def signup():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if 'user' in session:
+        return redirect(url_for('index'))
     if request.method == 'POST':
         # Get form data
         email = request.form['email']
@@ -166,6 +168,11 @@ def index():
         return render_template('index.html', user=user, chat_messages=chat_messages)
     else:
         return redirect(url_for('login'))
+    
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     with app.app_context():       
