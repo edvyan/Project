@@ -22,22 +22,45 @@
             <h3>Profile</h3>
             <div class="form-group">
                 <label for="firstname">First Name:</label>
-                <input type="text" id="firstname" name="firstname" class="form-control">
+                <input type="text" id="firstname" name="firstname" class="form-control" value="{{ user.firstname}}">
             </div>
             <div class="form-group">
                 <label for="lastname">Last Name:</label>
-                <input type="text" id="lastname" name="lastname" class="form-control">
+                <input type="text" id="lastname" name="lastname" class="form-control" value="{{ user.lastname}}"">
             </div>
             <div class="form-group">
                 <label for="email">Email:</label>
-            <input type="email" id="email" name="email" class="form-control">
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" class="form-control">
+            <input type="email" id="email" name="email" class="form-control" value="{{ user.email }}">
             </div>
             <button type="submit" value="Signup" class="btn btn-primary">Save</button>
         </form>
+        <div class="card">
+            <h5>Your Stock Interests</h5>
+            <form action="/profile" method="POST">
+                <div class="form-group">
+                    <select name="stocks" id="stocks" class="form-control">
+                        {% for company in companies %}
+                            <option value="{{company.id}}">{{company['name']}} ({{company['code']}})</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary mt-2">Add</button>
+                </div>
+            </form>
+            <table>
+                <thead>
+                    <th>Name</th>
+                    <th>Industry</th>
+                </thead>
+                <tbody>
+                    {% for uc in user_companies_list %}
+                        <tr>
+                            <td>{{ uc['name'] }}</td>
+                            <td>{{ uc['industry'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

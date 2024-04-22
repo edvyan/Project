@@ -8,3 +8,14 @@
         color: white !important;
     }
 }
+
+.content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+    padding: 1rem;
+
+    .card {
+        padding: 1rem;
+    }
+}

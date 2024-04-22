@@ -2,13 +2,14 @@ from flask import Flask, request, redirect, render_template, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from flask_assets import Environment, Bundle
+import csv
 
 from bot import generate_response
 
 app = Flask(__name__)
 app.secret_key = 'sunilkey'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.SQLite'
 Bootstrap(app)
 assets = Environment(app)
 db = SQLAlchemy(app)
@@ -23,8 +24,7 @@ profile = Bundle('profile.scss', filters='scss', output='gen/profile.css')
 assets.register('profile', profile)
 
 chat_messages = [
-    { 'sender': 'user', 'message': 'I am doing fine'},
-    { 'sender': 'bot', 'message': 'Hellow how are you doing today?'},
+    { 'sender': 'bot', 'message': 'Hello, how are you doing today?'},
 ]
 
 class User(db.Model):
@@ -50,14 +50,26 @@ class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(10), unique=True, nullable=False)
     name = db.Column(db.String(100), nullable=False)
+    industry = db.Column(db.String(100), nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'code': self.code,
+            'name': self.name,
+            'industry': self.industry
+        }
 
     def __repr__(self):
         return f"Company('{self.code}', '{self.name}')"
 
-user_company = db.Table('user_company',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('company_id', db.Integer, db.ForeignKey('company.id'), primary_key=True)
-)
+class UserInterest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
+
+    def __repr__(self):
+        return f"UserInterest"
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -108,7 +120,24 @@ def login():
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     if 'user' in session:
-        return render_template('profile.html', user=session['user'])
+        user=session['user']
+        if request.method == 'POST':
+            company_id = request.form['stocks']
+            insert_stmt = UserInterest(user_id=user['id'], company_id=company_id)
+            db.session.add(insert_stmt)
+            db.session.commit()
+        
+        all_companies = Company.query.all()
+        companies = [company.to_dict() for company in all_companies]
+        
+        user_companies = UserInterest.query.filter_by(user_id=user['id']).all()
+        user_company_ids = [uc.company_id for uc in user_companies]
+        
+        user_companies_list = [company if (company['id'] in user_company_ids) else None for company in companies]
+
+        companies = [ company for company in companies if company not in user_companies_list]
+        
+        return render_template('profile.html', user=user, companies=companies, user_companies_list=user_companies_list)
     else:
         return redirect(url_for('login'))
 
@@ -142,5 +171,22 @@ if __name__ == '__main__':
     with app.app_context():       
         # Create the database tables
         db.create_all()
+
+        if (len(Company.query.all()) < 1):
+            with open('../data/stock.csv', 'r') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    code = row['Symbol']
+                    name = row['Company Name']
+                    industry = row['Industry']
+                    
+                    existing_company = Company.query.filter_by(code=code).first()
+                
+                    if existing_company:
+                        print(f"Company with code '{code}' already exists. Skipping...")
+                    else:
+                        company = Company(code=code, name=name, industry=industry)
+                        db.session.add(company)
+            db.session.commit()
         
     app.run(debug=True)
