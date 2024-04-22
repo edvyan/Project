@@ -1,140 +1,79 @@
-import dash
-from dash import html, dcc, Output, Input, State
-import requests
-import pandas as pd
-from transformers import AutoModelForTokenClassification, AutoTokenizer
-import torch
-import re
-import warnings
-import logging
+# import dash
+# from dash import html, dcc, Input, Output, State, ClientsideFunction, callback_context
+# import dash_bootstrap_components as dbc
+# from flask import Flask
 
-# Suppress warnings
-warnings.filterwarnings("ignore", message="torch.utils._pytree._register_pytree_node is deprecated")
-warnings.filterwarnings("ignore", message="Some weights of the model checkpoint at")
+# # Import generate_response from chatbot
+# from bot import generate_response
 
-logging.getLogger('werkzeug').setLevel(logging.ERROR)
+# server = Flask(__name__)
+# app = dash.Dash(__name__, server=server, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-# Load CSV file and process data
-df_stocks = pd.read_csv('stock.csv')
-df_stocks['Normalized Company Name'] = df_stocks['Company Name'].str.lower().replace('[^a-zA-Z0-9 ]', '', regex=True)
+# # initial message
+# initial_bot_greeting = "Hello! I'm your financial advisor. How can I assist you today?\n"
 
-# Load NER model
-# model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
-# tokenizer = AutoTokenizer.from_pretrained(model_name)
-# model = AutoModelForTokenClassification.from_pretrained(model_name)
+# app.layout = dbc.Container([
+#     dbc.Row(html.H2("Financial Advisor Chatbot", className="text-center mb-4")), 
 
+#     dbc.Row(
+#         dcc.Textarea(
+#             id='chat-area',
+#             value=initial_bot_greeting,
+#             style={'width': '100%', 'height': '800px', 'overflowY': 'auto'}, 
+#             readOnly=True
+#         ),
+#         className="mb-3" 
+#     ),
 
-# def extract_company_names(text):
-#     inputs = tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
-#     outputs = model(**inputs)
-#     predictions = torch.argmax(outputs.logits, dim=2)
+#     dbc.Row(
+#         [
+#             dcc.Input(
+#                 id='user-input',
+#                 type='text',
+#                 placeholder='Type your message here...',
+#                 style={'width': '90%', 'height': '50px'}, 
+#                 n_submit=0,
+#                 value=''
+#             ),
+#             html.Button('Send', id='send-button', n_clicks=0, style={'height': '50px', 'width': '10%'}), 
+#         ],
+#         className="mb-3" 
+#     ),
 
-#     # Convert tokens to string
-#     tokens = tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
-#     entities = []
-#     current_entity = []
-
-#     # Convert prediction indices to labels
-#     prediction_labels = [model.config.id2label[prediction] for prediction in predictions[0].numpy()]
-
-#     # Entity reconstruction
-#     for token, label in zip(tokens, prediction_labels):
-#         if label == "B-ORG":  
-#             if current_entity:  # save the previous entity if it exists
-#                 entities.append(" ".join(current_entity))
-#             current_entity = [token.replace("##", "")]
-#         elif label == "I-ORG":  
-#             if current_entity:
-#                 if token.startswith("##"):
-#                     current_entity[-1] += token.replace("##", "")
-#                 else:
-#                     current_entity.append(token)
-#             else:
-#                 current_entity = [token.replace("##", "")]
-#         elif current_entity:  # Outside an entity
-#             entities.append(" ".join(current_entity))
-#             current_entity = []
-
-#     if current_entity:
-#         entities.append(" ".join(current_entity))
-
-#     return list(set(entities))  # return unique entities
+#     html.Div(id='company-context', style={'display': 'none'}),
+#     html.Div(id='ticker-context', style={'display': 'none'}),
+#     html.Div(id='dummy-div', style={'display': 'none'}) 
+# ], fluid=True)
 
 
-def map_entities_to_tickers(entities, df_stocks):
-    entity_ticker_map = {}
-    for entity in entities:
-        normalized_entity = entity.lower().replace('[^a-zA-Z0-9]', '')
-        pattern = r'\b' + re.escape(normalized_entity) + r'\b'
-        matched_row = df_stocks[df_stocks['Normalized Company Name'].str.contains(pattern, regex=True, na=False)]
-        if not matched_row.empty:
-            entity_ticker_map[entity] = matched_row.iloc[0]['Symbol']
-        else:
-            entity_ticker_map[entity] = "Ticker not found"
-    return entity_ticker_map
+# # handle sending messages
+# @app.callback(
+#     [Output('chat-area', 'value'), Output('user-input', 'value')],
+#     [Input('send-button', 'n_clicks'), Input('user-input', 'n_submit')],
+#     [State('user-input', 'value'), State('chat-area', 'value')]
+# )
+# def update_chat(send_clicks, enter_presses, input_text, chat_value):
+#     ctx = callback_context
+#     if not ctx.triggered:
+#         return chat_value, input_text  
+#     else:
+#         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
 
+#     if (button_id == 'send-button' or button_id == 'user-input') and input_text:
+#         response = generate_response(input_text)
+#         new_chat = f"{chat_value or ''}You: {input_text}\nBot: {response}\n\n"
+#         return new_chat, ''  
+#     return chat_value, input_text  
 
-# Initialize Dash
-app = dash.Dash(__name__)
+# # Clientside callback to handle auto-scrolling (if you prefer directly embedding JavaScript)
+# app.clientside_callback(
+#     ClientsideFunction(
+#         namespace='clientside',
+#         function_name='scrollToBottom'
+#     ),
+#     Output('dummy-div', 'children'), 
+#     Input('chat-area', 'value')  # Triggered whenever the chat-area text changes
+# )
 
-# App layout
-app.layout = html.Div([
-    html.H1("Stock Information Lookup", style={'text-align': 'center'}),
-    dcc.Input(
-        id='input-text', 
-        type='text', 
-        placeholder='e.g., "Show info on Apple"',
-        style={'width': '100%', 'padding': '10px', 'margin': '10px'}
-    ),
-    html.Button(
-        'Get Stock Info', 
-        id='button-submit', 
-        n_clicks=0,
-        style={'padding': '10px', 'margin': '10px'}
-    ),
-    html.Div(id='container-output', style={'margin': '20px', 'padding': '10px'})
-], style={'text-align': 'center', 'font-family': 'Arial, sans-serif'})
-
-# Callback for updating stock info
-@app.callback(
-    Output('container-output', 'children'),
-    Input('button-submit', 'n_clicks'),
-    State('input-text', 'value')
-)
-def update_output(n_clicks, text):
-    if n_clicks > 0 and text:
-        companies = extract_company_names(text)
-        tickers = map_entities_to_tickers(companies, df_stocks)
-        results = []
-        for company, ticker in tickers.items():
-            if ticker != "Ticker not found":
-                results.append(fetch_stock_data(ticker))
-        if results:
-            return html.Div(results)
-        else:
-            return html.Div("No valid stock tickers found from input.")
-    return "Enter a query and click submit."
-
-def fetch_stock_data(ticker):
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey=YOUR_API_KEY'
-    response = requests.get(url)
-    data = response.json()
-
-    try:
-        daily_data = data['Time Series (Daily)']
-        recent_dates = sorted(daily_data.keys(), reverse=True)[:7]  # Last 7 days
-        historical_info = []
-        for date in recent_dates:
-            close_price = float(daily_data[date]['4. close'])
-            volume = daily_data[date]['5. volume']
-            historical_info.append(f"Date: {date}, Close: {close_price}, Volume: {volume}")
-
-        return html.Div([
-            html.H3(f"Stock Data for {ticker} - Last 7 Days"),
-            html.Ul([html.Li(info) for info in historical_info])
-        ])
-    except KeyError:
-        return f'Stock data not available for {ticker}.'
-
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# if __name__ == '__main__':
+#     app.run_server(debug=True)

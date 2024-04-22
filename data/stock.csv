@@ -1,4 +1,6 @@
 Symbol,Company Name,Industry,Market Cap
+TSLA,"Tesla Inc", Automotive, 500B
+MSFT, "Microsoft", Software, 1000B
 A,"Agilent Technologies, Inc.",Diagnostics & Research,42.25B
 AA,Alcoa Corporation,Aluminum,6.50B
 AACG,ATA Creativity Global,Education & Training Services,33.57M
@@ -306,7 +308,7 @@ AMTD,AMTD IDEA Group,Asset Management,4.02B
 AMTX,"Aemetis, Inc.",Oil & Gas Refining & Marketing,176.20M
 AMWD,American Woodmark Corporation,"Furnishings, Fixtures & Appliances",1.55B
 AMWL,American Well Corporation,Health Information Services,192.30M
-AMX,"Am??rica M??vil, SAB de CV",Telecom Services,57.52B
+AMX,"Am��rica M��vil, SAB de CV",Telecom Services,57.52B
 AMZN,"Amazon.com, Inc.",Internet Retail,"1,931.54B"
 AN,"AutoNation, Inc.",Auto & Truck Dealerships,6.44B
 ANAB,"AnaptysBio, Inc.",Biotechnology,593.34M
@@ -886,7 +888,7 @@ BWB,"Bridgewater Bancshares, Inc.",Banks - Regional,307.58M
 BWEN,"Broadwind, Inc.",Specialty Industrial Machinery,51.15M
 BWFG,"Bankwell Financial Group, Inc.",Banks - Regional,195.50M
 BWMN,Bowman Consulting Group Ltd.,Engineering & Construction,534.49M
-BWMX,"Betterware de M??xico, S.A.P.I. de C.V.",Specialty Retail,712.75M
+BWMX,"Betterware de M��xico, S.A.P.I. de C.V.",Specialty Retail,712.75M
 BWXT,"BWX Technologies, Inc.",Aerospace & Defense,8.81B
 BX,Blackstone Inc.,Asset Management,152.79B
 BXC,BlueLinx Holdings Inc.,Industrial Distribution,1.04B
@@ -906,7 +908,7 @@ BZFD,"BuzzFeed, Inc.",Internet Content & Information,60.26M
 BZH,"Beazer Homes USA, Inc.",Residential Construction,907.23M
 BZUN,Baozun Inc.,Internet Retail,102.16M
 C,Citigroup Inc.,Banks - Diversified,115.26B
-CAAP,Corporaci??n Am??rica Airports S.A.,Airports & Air Services,2.72B
+CAAP,Corporaci��n Am��rica Airports S.A.,Airports & Air Services,2.72B
 CAAS,"China Automotive Systems, Inc.",Auto Parts,114.40M
 CABA,"Cabaletta Bio, Inc.",Biotechnology,861.60M
 CABO,"Cable One, Inc.",Telecom Services,2.13B
@@ -1428,7 +1430,7 @@ DALN,DallasNews Corporation,Publishing,20.45M
 DAN,Dana Incorporated,Auto Parts,1.78B
 DAO,"Youdao, Inc.",Education & Training Services,492.07M
 DAR,Darling Ingredients Inc.,Packaged Foods,7.60B
-DARE,"Dar?? Bioscience, Inc.",Biotechnology,48.14M
+DARE,"Dar�� Bioscience, Inc.",Biotechnology,48.14M
 DASH,"DoorDash, Inc.",Internet Content & Information,55.42B
 DATS,"DatChat, Inc.",Software - Application,3.82M
 DAVA,Endava plc,Software - Infrastructure,1.91B
@@ -1614,7 +1616,7 @@ EBC,"Eastern Bankshares, Inc.",Banks - Regional,2.23B
 EBF,"Ennis, Inc.",Business Equipment & Supplies,509.21M
 EBMT,"Eagle Bancorp Montana, Inc.",Banks - Regional,101.65M
 EBON,Ebang International Holdings Inc.,Computer Hardware,57.72M
-EBR,Centrais El??tricas Brasileiras S.A. - Eletrobr??s,Utilities - Renewable,18.67B
+EBR,Centrais El��tricas Brasileiras S.A. - Eletrobr��s,Utilities - Renewable,18.67B
 EBS,Emergent BioSolutions Inc.,Drug Manufacturers - Specialty & Generic,116.41M
 EBTC,"Enterprise Bancorp, Inc.",Banks - Regional,290.88M
 EC,Ecopetrol S.A.,Oil & Gas Integrated,24.34B
@@ -1667,7 +1669,7 @@ EIGR,"Eiger BioPharmaceuticals, Inc.",Biotechnology,2.55M
 EIX,Edison International,Utilities - Regulated Electric,26.50B
 EJH,E-Home Household Service Holdings Limited,Personal Services,49.46M
 EKSO,"Ekso Bionics Holdings, Inc.",Medical Instruments & Supplies,22.56M
-EL,The Est??e Lauder Companies Inc.,Household & Personal Products,51.93B
+EL,The Est��e Lauder Companies Inc.,Household & Personal Products,51.93B
 ELA,Envela Corporation,Luxury Goods,117.52M
 ELAB,"Elevai Labs, Inc.",Biotechnology,10.57M
 ELAN,Elanco Animal Health Incorporated,Drug Manufacturers - Specialty & Generic,7.27B
@@ -1955,7 +1957,7 @@ FMBH,"First Mid Bancshares, Inc.",Banks - Regional,707.13M
 FMC,FMC Corporation,Agricultural Inputs,7.77B
 FMNB,Farmers National Banc Corp.,Banks - Regional,456.93M
 FMS,Fresenius Medical Care AG & Co. KGaA,Medical Care Facilities,11.20B
-FMX,"Fomento Econ??mico Mexicano, SAB de CV",Beverages - Brewers,27.01B
+FMX,"Fomento Econ��mico Mexicano, SAB de CV",Beverages - Brewers,27.01B
 FN,Fabrinet,Electronic Components,6.42B
 FNA,"Paragon 28, Inc.",Medical Devices,865.65M
 FNB,F.N.B. Corporation,Banks - Regional,4.69B
@@ -3190,7 +3192,7 @@ ITRI,"Itron, Inc.",Scientific & Technical Instruments,4.15B
 ITRM,Iterum Therapeutics plc,Biotechnology,22.01M
 ITRN,Ituran Location and Control Ltd.,Communication Equipment,544.74M
 ITT,ITT Inc.,Specialty Industrial Machinery,10.65B
-ITUB,Ita?? Unibanco Holding S.A.,Banks - Regional,57.61B
+ITUB,Ita�� Unibanco Holding S.A.,Banks - Regional,57.61B
 ITW,Illinois Tool Works Inc.,Specialty Industrial Machinery,77.48B
 IVA,Inventiva S.A.,Biotechnology,203.72M
 IVAC,"Intevac, Inc.",Specialty Industrial Machinery,100.99M
@@ -3823,7 +3825,7 @@ OZ,"Belpointe PREP, LLC",Real Estate - Development,223.08M
 OZK,Bank OZK,Banks - Regional,4.96B
 PAA,"Plains All American Pipeline, L.P.",Oil & Gas Midstream,12.71B
 PAAS,Pan American Silver Corp.,Gold,6.94B
-PAC,"Grupo Aeroportuario del Pac??fico, SAB de CV",Airports & Air Services,8.58B
+PAC,"Grupo Aeroportuario del Pac��fico, SAB de CV",Airports & Air Services,8.58B
 PACB,"Pacific Biosciences of California, Inc.",Medical Devices,892.28M
 PACK,Ranpak Holdings Corp.,Packaging & Containers,590.58M
 PAG,"Penske Automotive Group, Inc.",Auto & Truck Dealerships,10.06B
@@ -3832,7 +3834,7 @@ PAGS,PagSeguro Digital Ltd.,Software - Infrastructure,4.28B
 PAHC,Phibro Animal Health Corporation,Drug Manufacturers - Specialty & Generic,535.86M
 PALI,"Palisade Bio, Inc.",Biotechnology,49.37M
 PALT,"Paltalk, Inc.",Software - Application,32.00M
-PAM,Pampa Energ??a S.A.,Utilities - Independent Power Producers,2.97B
+PAM,Pampa Energ��a S.A.,Utilities - Independent Power Producers,2.97B
 PANL,"Pangaea Logistics Solutions, Ltd.",Marine Shipping,310.23M
 PANW,"Palo Alto Networks, Inc.",Software - Infrastructure,90.79B
 PAPL,Pineapple Financial Inc.,Mortgage Finance,11.20M
@@ -3861,8 +3863,8 @@ PBHC,"Pathfinder Bancorp, Inc.",Banks - Regional,76.71M
 PBI,Pitney Bowes Inc.,Integrated Freight & Logistics,727.30M
 PBM,Psyence Biomedical Ltd.,Shell Companies,12.22M
 PBPB,Potbelly Corporation,Restaurants,315.86M
-PBR,Petr??leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.97B
-PBR.A,Petr??leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.83B
+PBR,Petr��leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.97B
+PBR.A,Petr��leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.83B
 PBT,Permian Basin Royalty Trust,Oil & Gas Midstream,583.54M
 PBYI,"Puma Biotechnology, Inc.",Biotechnology,266.34M
 PCAR,PACCAR Inc,Farm & Heavy Construction Machinery,62.19B
@@ -4323,7 +4325,7 @@ OZ,"Belpointe PREP, LLC",Real Estate - Development,223.08M
 OZK,Bank OZK,Banks - Regional,4.96B
 PAA,"Plains All American Pipeline, L.P.",Oil & Gas Midstream,12.71B
 PAAS,Pan American Silver Corp.,Gold,6.94B
-PAC,"Grupo Aeroportuario del Pac??fico, SAB de CV",Airports & Air Services,8.58B
+PAC,"Grupo Aeroportuario del Pac��fico, SAB de CV",Airports & Air Services,8.58B
 PACB,"Pacific Biosciences of California, Inc.",Medical Devices,892.28M
 PACK,Ranpak Holdings Corp.,Packaging & Containers,590.58M
 PAG,"Penske Automotive Group, Inc.",Auto & Truck Dealerships,10.06B
@@ -4332,7 +4334,7 @@ PAGS,PagSeguro Digital Ltd.,Software - Infrastructure,4.28B
 PAHC,Phibro Animal Health Corporation,Drug Manufacturers - Specialty & Generic,535.86M
 PALI,"Palisade Bio, Inc.",Biotechnology,49.37M
 PALT,"Paltalk, Inc.",Software - Application,32.00M
-PAM,Pampa Energ??a S.A.,Utilities - Independent Power Producers,2.97B
+PAM,Pampa Energ��a S.A.,Utilities - Independent Power Producers,2.97B
 PANL,"Pangaea Logistics Solutions, Ltd.",Marine Shipping,310.23M
 PANW,"Palo Alto Networks, Inc.",Software - Infrastructure,90.79B
 PAPL,Pineapple Financial Inc.,Mortgage Finance,11.20M
@@ -4361,8 +4363,8 @@ PBHC,"Pathfinder Bancorp, Inc.",Banks - Regional,76.71M
 PBI,Pitney Bowes Inc.,Integrated Freight & Logistics,727.30M
 PBM,Psyence Biomedical Ltd.,Shell Companies,12.22M
 PBPB,Potbelly Corporation,Restaurants,315.86M
-PBR,Petr??leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.97B
-PBR.A,Petr??leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.83B
+PBR,Petr��leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.97B
+PBR.A,Petr��leo Brasileiro S.A. - Petrobras,Oil & Gas Integrated,102.83B
 PBT,Permian Basin Royalty Trust,Oil & Gas Midstream,583.54M
 PBYI,"Puma Biotechnology, Inc.",Biotechnology,266.34M
 PCAR,PACCAR Inc,Farm & Heavy Construction Machinery,62.19B
@@ -4912,7 +4914,7 @@ SBLK,Star Bulk Carriers Corp.,Marine Shipping,2.00B
 SBOW,"SilverBow Resources, Inc.",Oil & Gas Exploration & Production,885.46M
 SBR,Sabine Royalty Trust,Oil & Gas Exploration & Production,991.83M
 SBRA,"Sabra Health Care REIT, Inc.",REIT - Healthcare Facilities,3.19B
-SBS,Companhia de Saneamento B??sico do Estado de S?o Paulo - SABESP,Utilities - Regulated Water,11.26B
+SBS,Companhia de Saneamento B��sico do Estado de S?o Paulo - SABESP,Utilities - Regulated Water,11.26B
 SBSI,"Southside Bancshares, Inc.",Banks - Regional,820.83M
 SBSW,Sibanye Stillwater Limited,Gold,3.63B
 SBT,"Sterling Bancorp, Inc. (Southfield, MI)",Banks - Regional,251.49M
@@ -5284,7 +5286,7 @@ VLD,"Velo3D, Inc.",Computer Hardware,74.30M
 VLGEA,"Village Super Market, Inc.",Grocery Stores,372.53M
 VLN,Valens Semiconductor Ltd.,Semiconductors,256.71M
 VLO,Valero Energy Corporation,Oil & Gas Refining & Marketing,58.42B
-VLRS,"Controladora Vuela Compa???a de Aviaci??n, SAB de CV",Airlines,886.19M
+VLRS,"Controladora Vuela Compa?��a de Aviaci��n, SAB de CV",Airlines,886.19M
 VLTO,Veralto Corporation,Pollution & Treatment Controls,21.74B
 VLY,Valley National Bancorp,Banks - Regional,3.73B
 VMAR,Vision Marine Technologies Inc.,Recreational Vehicles,7.02M
@@ -5343,7 +5345,7 @@ VTAK,"Catheter Precision, Inc.",Medical Devices,3.45M
 VTEX,VTEX,Software - Application,1.56B
 VTGN,"VistaGen Therapeutics, Inc.",Biotechnology,137.83M
 VTLE,"Vital Energy, Inc.",Oil & Gas Exploration & Production,2.10B
-VTMX,"Corporaci??n Inmobiliaria Vesta, S.A.B. de C.V.",Real Estate - Development,3.39B
+VTMX,"Corporaci��n Inmobiliaria Vesta, S.A.B. de C.V.",Real Estate - Development,3.39B
 VTNR,"Vertex Energy, Inc.",Oil & Gas Refining & Marketing,103.80M
 VTOL,Bristow Group Inc.,Oil & Gas Equipment & Services,742.19M
 VTR,"Ventas, Inc.",REIT - Healthcare Facilities,17.06B

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% assets "scss_all" %}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+</head>
+<body>
+    <div class="content">
+        <form action="/signup" method="post" class="card">
+            <h3>Signup</h3>
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" id="firstname" name="firstname" class="form-control">
+            </div>
+            <div class="form-group">
+            <label for="lastname">Last Name:</label>
+            <input type="text" id="lastname" name="lastname" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+            <input type="email" id="email" name="email" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="form-control">
+            </div>
+            <select name="preferred_stocks" id="preferred_stocks" class="form-control">
+                {% for key, value in stocks_dict.items() %}
+                    <option value="{{value}}" class="form-control">{{value}}</option>
+                {% endfor %}
+            </select>
+            <!-- Add more options for other stocks -->
+        </select><br>
+            <button type="submit" value="Signup" class="btn btn-primary">Sign Up</button>
+            <a href="{{ url_for('login') }}">Don't have an account? Sign up!</a>
+        </form>
+    </div>
+</body>
+</html>

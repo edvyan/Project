@@ -1,0 +1,68 @@
+.nav-bar {
+    display: flex;
+    color: white;
+    justify-content: space-between;
+    padding: 1rem;
+
+    a {
+        color: white !important;
+    }
+}
+
+.content {
+    margin: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1rem;
+}
+
+.chat-container {
+    .card {
+        padding: 1rem;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-messages {
+        border: 1px solid gray;
+        border-radius: 0.25rem;
+        display: flex;
+        flex-direction: column-reverse;
+        height: 30rem;
+        padding: 1rem;
+        overflow-y: scroll;
+
+        .message {
+            border-radius: 0.5rem;
+            color: white;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+
+            &__user {
+                align-self: flex-end;
+                background-color: blue;
+            }
+
+            &__bot {
+                align-self: flex-start;
+                background-color: green;
+            }
+        }
+    }
+
+    form {
+        display: flex;
+        width: 100%;
+        input {
+            padding: 0.5rem;
+            width: 100%;
+        }
+    }
+}
+
+.stocks-container {
+    padding: 1rem;
+}

@@ -1,0 +1,26 @@
+news_api:
+  api_key: c347856255d54313bb339a8b8f69879f
+  url: https://newsapi.org/v2/everything?q=
+
+stock_api:
+  api_key: ''
+  url: https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=
+
+
+predefined_resposes:
+  hello: Hello, I am your financial advisor. What can I do for you?
+  hi: Hi there! How can I assist you with your financial queries today?
+  help: Sure, I'm here to help. You can ask me about company stock prices, financial reports, or general financial advice.
+  goodbye: Goodbye! Feel free to return if you have more financial questions.
+  how are you: I am good, thank you! What financial services do you want?
+  who are you: I am your financial advisor. What can I do for you?
+  thank you: You're welcome!
+  bye: Bye, see you next time!
+  OK: What else do you want to know?
+
+
+
+
+
+
+
