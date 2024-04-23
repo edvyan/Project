@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bootstrap import Bootstrap
 from flask_assets import Environment, Bundle
 import csv
+from datetime import datetime
 
 from bot import get_personalised_stock_info, generate_response, get_latest_stock_data
 
@@ -70,6 +71,10 @@ class UserInterest(db.Model):
 
     def __repr__(self):
         return f"UserInterest"
+    
+def format_datetime(datetime_str):
+    timestamp_dt = datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%SZ")
+    return timestamp_dt.strftime("%d %b %Y %H:%M")
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -162,6 +167,10 @@ def index():
         # companies = [ company for company in user_companies_list if company not in user_companies_list]
         personalised_news = [get_personalised_stock_info(user_company['name']) for user_company in user_companies_list]
         personalised_stocks = [{**get_latest_stock_data(user_company['code']), "Name":user_company['name'], "Symbol":user_company['code']} for user_company in user_companies_list if get_latest_stock_data(user_company['code']) is not None]
+        
+        for news in personalised_news:
+            news['publishedAt'] = format_datetime(news['publishedAt'])
+        
         # Render the template
         if request.method == 'POST':
             query = request.form['query']

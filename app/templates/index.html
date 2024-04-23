@@ -43,7 +43,7 @@
             <div class="card-body">
                 <h4>Latest Market Figures</h4><br>
                 <table border="2">
-                    <tr>
+                    <thead>
                       <th>Name</th>
                       <th>Symbol</th>
                       <th>Open</th>
@@ -52,11 +52,11 @@
                       <th>Close</th>
                       <th>Volume</th>
                       <th>Last Updated</th>
-                    </tr>
-                    {% for stock in personalised_stocks %}
-                    <tr>
-                        {% for data in stock %}
-                            <td>{data.Name}</td>
+                    </thead>
+                    <tbody>
+                        {% for data in personalised_stocks %}
+                        <tr>
+                            <td>{{ data.Name }}</td>
                             <td>{{data.Symbol}}</td>
                             <td>{{data.open}}</td>
                             <td>{{data.high}}</td>
@@ -64,9 +64,9 @@
                             <td>{{data.close}}</td>
                             <td>{{data.volume}}</td>
                             <td>{{data.last_updated}}</td>
+                        </tr>
                         {% endfor %}
-                    </tr>
-                    {% endfor %}
+                    </tbody>
                   </table>
                 <br/>
                 <br/>
