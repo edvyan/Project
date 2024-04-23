@@ -4,6 +4,8 @@ import nltk
 import pandas as pd
 from fuzzywuzzy import process
 import requests  
+from config import config
+
 
 
 # GPT2 model for general conversation and text generation
@@ -77,7 +79,7 @@ def map_entities_to_tickers(entities):
     return entity_ticker_map
 
 def fetch_stock_data(ticker):
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey=YOUR_API_KEY' 
+    url = f"{config['stock_api']['url']}{ticker}&apikey={config['stock_api']['api_key']}"
     response = requests.get(url)
     data = response.json()
 
@@ -103,21 +105,30 @@ def fetch_stock_data(ticker):
     except KeyError:
         return f'Stock data not available for {ticker}.'
 
+def get_latest_stock_data(ticker):
+    try:
+        url = f"{config['stock_api']['url']}{ticker}&apikey={config['stock_api']['api_key']}"
+        response = requests.get(url)
+        data = response.json()
+        last_refreshed_date = data['Meta Data']['3. Last Refreshed']
+        last_refreshed_data = data['Time Series (Daily)'][last_refreshed_date]
+        latest_stock_update = {'open':last_refreshed_data['1. open'], 
+                            'high':last_refreshed_data['2. high'],
+                            'low': last_refreshed_data['3. low'],
+                            'close': last_refreshed_data['4. close'],
+                            'volume': last_refreshed_data['5. volume'],
+                            'last_updated': last_refreshed_date}
+    except KeyError as e:
+        print(e)
+        latest_stock_update = None
+    return latest_stock_update
+
 def get_predefined_response(input_text):
     """
     Returns predefined responses for common inputs to make the chatbot more interactive and user-friendly.
     """
-    predefined_responses = {
-        "hello": "Hello, I am your financial advisor. What can I do for you?",
-        "hi": "Hi there! How can I assist you with your financial queries today?",
-        "help": "Sure, I'm here to help. You can ask me about company stock prices, financial reports, or general financial advice.",
-        "goodbye": "Goodbye! Feel free to return if you have more financial questions.",
-        "how are you": "I am good, thank you! What financial services do you want?",
-        "who are you": "I am your financial advisor. What can I do for you?",
-        "thank you":"You're welcome!",
-        "bye":"Bye, see you next time!",
-        "OK":"What else do you want to know?"
-    }
+
+    predefined_responses = config['predefined_responses']
     
     # Check if the input text is in the predefined responses
     for key in predefined_responses:
@@ -134,8 +145,8 @@ def summarize_text(text):
     return summary
 
 def fetch_and_summarize_news(company):
-    api_key = "c347856255d54313bb339a8b8f69879f"  # Ensure to secure your API key
-    url = f"https://newsapi.org/v2/everything?q={company}&apiKey={api_key}"
+    api_key = config['news_api']['api_key']  # Ensure to secure your API key
+    url = f"{config['api_key']['url']}{company}&apiKey={api_key}"
     response = requests.get(url)
     data = response.json()
 
@@ -150,6 +161,22 @@ def fetch_and_summarize_news(company):
         return "\n".join(summaries)
     else:
         return f"Failed to fetch news or no news available for {company}."
+
+def get_personalised_stock_info(company):
+    api_key = config['news_api']['api_key']  # Ensure to secure your API key
+    url = f"{config['news_api']['url']}{company}&apiKey={api_key}"
+    response = requests.get(url)
+    data = response.json()
+    stock_info = []
+    for article in data['articles']:
+        article_dict = {'title': article['title'], 'description':article['description'], "publishedAt": article['publishedAt'], 'url':article['url']}
+        stock_info.append(article_dict)
+    stock_info = sorted(stock_info, key=lambda x: x['publishedAt'], reverse=True)
+    if stock_info:
+        stock_info = stock_info[0]
+    else: stock_info = None
+    return stock_info
+
 
 def handle_financial_tasks(text):
     inputs = finbert_tokenizer(text, return_tensors="pt", padding=True, truncation=True)

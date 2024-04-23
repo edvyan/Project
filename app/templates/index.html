@@ -39,10 +39,85 @@
             </div>
         </div>
         <div class="card stocks-container">
-            <h5>Your Stocks Review:</h5>
+            <h3>Your Personalised Stocks Review:</h3>
             <div class="card-body">
-
+                <h4>Latest Market Figures</h4><br>
+                <table border="2">
+                    <tr>
+                      <th>Name</th>
+                      <th>Symbol</th>
+                      <th>Open</th>
+                      <th>High</th>
+                      <th>Low</th>
+                      <th>Close</th>
+                      <th>Volume</th>
+                      <th>Last Updated</th>
+                    </tr>
+                    {% for stock in personalised_stocks %}
+                    <tr>
+                        {% for data in stock %}
+                            <td>{data.Name}</td>
+                            <td>{{data.Symbol}}</td>
+                            <td>{{data.open}}</td>
+                            <td>{{data.high}}</td>
+                            <td>{{data.low}}</td>
+                            <td>{{data.close}}</td>
+                            <td>{{data.volume}}</td>
+                            <td>{{data.last_updated}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                      <!-- <td>Apple</td>
+                      <td>APPL</td>
+                      <td>35.2000</td>
+                      <td>36.4400</td>
+                      <td>35.0600</td>
+                      <td>35.5300</td>
+                      <td>8016819</td>
+                      <td>2024-04-19</td>
+                    </tr>
+                    <tr>
+                      <td>Google</td>
+                      <td>GOOGL</td>
+                      <td>10.6400</td>
+                      <td>10.6400</td>
+                      <td>10.6100</td>
+                      <td>10.6100</td>
+                      <td>8979</td>
+                      <td>2024-04-19</td>
+                    </tr>
+                    <tr>
+                      <td>Tesla Inc</td>
+                      <td>TSLA</td>
+                      <td>1.7800</td>
+                      <td>1.8550</td>
+                      <td>1.7800</td>
+                      <td>1.8400</td>
+                      <td>137812</td>
+                      <td>2024-04-19</td>
+                    </tr> -->
+                  </table>
+                <br/>
+                <br/>
+                <hr>
+                <h4>News Articles</h4>
+                <div class="news-container">
+                    {% for article in personalised_news %}
+                        <div class="article">
+                            <h5>{{ article.title }}</h5>
+                            <p>{{ article.description }}</p>
+                            <p>Published At: {{ article.publishedAt }}</p>
+                            {% if article.url %}
+                                <a href="{{article.url}}" target="_blank">Visit Source</a>
+                                <!-- <img src="{{ article.image }}" alt="Article Image"> -->
+                            {% endif %}
+                        </div>
+                        </br>
+                        <hr>
+                    {% endfor %}
+                </div>
             </div>
+            
         </div>
     </div>
 </body>

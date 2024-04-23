@@ -4,7 +4,7 @@ from flask_bootstrap import Bootstrap
 from flask_assets import Environment, Bundle
 import csv
 
-from bot import generate_response
+from bot import get_personalised_stock_info, generate_response, get_latest_stock_data
 
 app = Flask(__name__)
 app.secret_key = 'sunilkey'
@@ -152,6 +152,16 @@ def index():
         # Access user attributes as needed
         firstname = user['firstname']
         lastname = user['lastname']
+
+        all_companies = Company.query.all()
+        companies = [company.to_dict() for company in all_companies]
+        user_companies = UserInterest.query.filter_by(user_id=user['id']).all()
+        user_company_ids = [uc.company_id for uc in user_companies]
+        user_companies_list = [company if (company['id'] in user_company_ids) else None for company in companies]
+        user_companies_list = [company for company in user_companies_list if company is not None]
+        # companies = [ company for company in user_companies_list if company not in user_companies_list]
+        personalised_news = [get_personalised_stock_info(user_company['name']) for user_company in user_companies_list]
+        personalised_stocks = [{**get_latest_stock_data(user_company['code']), "Name":user_company['name'], "Symbol":user_company['code']} for user_company in user_companies_list if get_latest_stock_data(user_company['code']) is not None]
         # Render the template
         if request.method == 'POST':
             query = request.form['query']
@@ -160,12 +170,12 @@ def index():
                 'sender': 'user',
                 'message': query
             })
-            response = generate_response(query)
+            response = "Test" #generate_response(query)
             chat_messages.insert(0, {
                 'sender': 'bot',
                 'message': response
             })
-        return render_template('index.html', user=user, chat_messages=chat_messages)
+        return render_template('index.html', user=user, personalised_news=personalised_news, personalised_stocks=personalised_stocks, chat_messages=chat_messages)
     else:
         return redirect(url_for('login'))
     
