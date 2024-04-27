@@ -112,6 +112,37 @@ def fetch_stock_data(ticker):
         return markdown_table, dates, prices
     except Exception as e:
         return f'Error fetching data for {ticker}: {str(e)}', [], []
+
+def fetch_recent_stock_data(ticker):
+    try:
+        file_path = f'../data/stock_data/{ticker}.json'
+        with open(file_path, 'r') as file:
+            data = json.load(file)
+
+        daily_data = data['Time Series (Daily)']
+        recent_dates = sorted(daily_data.keys(), reverse=True)[:7]  # Last 7 days
+
+        prev_close = None
+
+        stock_data = []
+        for date in recent_dates:
+            close_price = float(daily_data[date]['4. close'])
+            volume = daily_data[date]['5. volume']
+            change_amt = close_price - prev_close if prev_close is not None else 0
+            change_pct = (change_amt / prev_close) * 100 if prev_close is not None else 0
+            prev_close = close_price
+
+            stock_data.append({
+                'date': date,
+                'close_price': close_price,
+                'change_amt': change_amt,
+                'change_pct': change_pct,
+                'volume': volume
+            })
+
+        return stock_data
+    except Exception as e:
+        return f'Error fetching data for {ticker}: {str(e)}', [], []
     
 
 def get_latest_stock_data(ticker):
@@ -315,7 +346,7 @@ def handle_full_request(input_text):
         return f"No ticker found for {company_name}."
 
     # Step 2: Fetch and display the stock data
-    stock_response, dates, prices = fetch_stock_data(company_ticker)
+    stock_data = fetch_recent_stock_data(company_ticker)
     
     # Step 3: Fetch news, summarize, and perform sentiment analysis
     news_file_path = f'../data/news_data/{company_name.lower()}.json'
@@ -327,14 +358,18 @@ def handle_full_request(input_text):
     advice = generate_investment_advice(news_result['combined_sentiment'])
 
     # Step 5: Compile the response
-    response = f"Stock Data for {company_name} - Last 7 Days:\n{stock_response}\n\n"
-    response += "Recent News Summaries:\n"
-    for idx, summary in enumerate(news_result['summaries'], 1):
-        response += f"{idx}: {summary}\n"
-    response += f"\nMarket Sentiment Analysis: {news_result['combined_sentiment']}\n"
-    response += f"\nInvestment Advice: {advice}"
+    # response = f"Stock Data for {company_name} - Last 7 Days:\n{stock_response}\n\n"
+    # response += "Recent News Summaries:\n"
+    # for idx, summary in enumerate(news_result['summaries'], 1):
+    #     response += f"{idx}: {summary}\n"
+    # response += f"\nMarket Sentiment Analysis: {news_result['combined_sentiment']}\n"
+    # response += f"\nInvestment Advice: {advice}"
     
-    return response
+    return {
+        'stock_response': stock_data,
+        'news_result': news_result,
+        'advice': advice,
+    }
 
 # Advice function
 def generate_investment_advice(sentiment_analysis):

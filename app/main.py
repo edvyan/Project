@@ -5,7 +5,7 @@ from flask_assets import Environment, Bundle
 import csv
 from datetime import datetime
 
-from bot import get_personalised_stock_info, generate_response, get_latest_stock_data
+from botv2 import get_personalised_stock_info, generate_response, get_latest_stock_data
 
 app = Flask(__name__)
 app.secret_key = 'sunilkey'
@@ -180,26 +180,99 @@ def personalised_content():
     if 'user' in session:
         user = session['user']
 
-        all_companies = Company.query.all()
-        companies = [company.to_dict() for company in all_companies]
-        user_companies = UserInterest.query.filter_by(user_id=user['id']).all()
-        user_company_ids = [uc.company_id for uc in user_companies]
-        user_companies_list = [company if (company['id'] in user_company_ids) else None for company in companies]
-        user_companies_list = [company for company in user_companies_list if company is not None]
-        # companies = [ company for company in user_companies_list if company not in user_companies_list]
-        personalised_news = [get_personalised_stock_info(user_company['name']) for user_company in user_companies_list]
-        personalised_stocks = [{**get_latest_stock_data(user_company['code']), "Name":user_company['name'], "Symbol":user_company['code']} for user_company in user_companies_list if get_latest_stock_data(user_company['code']) is not None]
+        # all_companies = Company.query.all()
+        # companies = [company.to_dict() for company in all_companies]
+        # user_companies = UserInterest.query.filter_by(user_id=user['id']).all()
+        # user_company_ids = [uc.company_id for uc in user_companies]
+        # user_companies_list = [company if (company['id'] in user_company_ids) else None for company in companies]
+        # user_companies_list = [company for company in user_companies_list if company is not None]
+        # # companies = [ company for company in user_companies_list if company not in user_companies_list]
+        # personalised_news = [get_personalised_stock_info(user_company['name']) for user_company in user_companies_list]
+        # personalised_stocks = [{**get_latest_stock_data(user_company['code']), "Name":user_company['name'], "Symbol":user_company['code']} for user_company in user_companies_list if get_latest_stock_data(user_company['code']) is not None]
         
-        for news in personalised_news:
-            news['publishedAt'] = format_datetime(news['publishedAt'])
+        # for news in personalised_news:
+        #     news['publishedAt'] = format_datetime(news['publishedAt'])
 
         return {
-            'news': personalised_news,
-            'stocks': personalised_stocks
+            'news': [],
+            'stocks': []
         }
     
     return redirect(url_for('login'))
 
+@app.route('/send-query', methods = ['POST'])
+def send_query():
+    query = request.json.get('query')
+    # response = generate_response(query)
+    return {
+        "advice": "Based on current market sentiment analysis, we recommend to Hold.",
+        "news_result": {
+            "combined_sentiment": { 
+                "sentiment": "neutral", 
+                "confidence": 0.99
+            },
+            "summaries": [
+                "Apple's financial performance surpassed analysts' expectations. Revenue reached new heights fueled by strong iPhone sales and robust growth in its services division. CEO Tim Cook attributed the success to the unwavering dedication of Apple's employees and the unparalleled loyalty of its customer base. Investors remain optimistic about Apple's future prospects, buoyed by anticipation for the upcoming release of new products.",
+                "Analysts are bullish on Apple's stock price, projecting a bullish trajectory for the tech giant in the coming months. Apple's robust balance sheet and cash reserves provide a solid foundation for future investments and strategic initiatives. As the company continues to innovate, investors can expect sustained growth and shareholder value over the long term.",
+                "Apple announced plans to invest in solar and wind energy projects. The tech giant aims to power its operations with 100% renewable energy. Apple's commitment to renewable energy has positive implications for its bottom line. By investing in renewable energy, Apple paves the way for a more environmentally friendly future.",
+                "Apple unveiled its latest MacBook Pro, featuring a stunning Retina display and an ultra-responsive keyboard that enhances productivity and creativity. New model is powered by the latest Intel processors and advanced graphics chips, delivering unparalleled speed and efficiency for demanding tasks such as video editing and gaming. With its unrivaled performance, stunning design, and cutting-edge features, the MacBook Pro remains the gold standard in portable computing.",
+                "Apple introduces a slew of new features to its Health app, empowering users to take control of their well-being and make informed decisions about their health. The latest updates include tools for tracking sleep patterns, monitoring heart rate variability, and recording symptoms. Users can now connect with healthcare providers remotely and access virtual consultations from the comfort of their homes.",
+                "Apple announced the expansion of its Apple Card to additional countries, marking a significant milestone in the global rollout of its digital credit card. Launched with great success in the United States, the Apple Card has garnered praise for its simplicity, transparency, and integration with the Apple ecosystem. The expansion to new markets reflects Apple's commitment to making financial services more accessible and user-friendly for consumers.",
+                "Rumors suggest Apple is preparing to launch augmented reality (AR) glasses next year. Apple's entry could herald a new era of immersive computing and redefine how users interact with digital content. The possibilities for AR glasses are endless, offering users a new dimension of interaction with the world around them."
+            ]
+        },
+        "stock_response": [
+    {
+        "change_amt": 0,
+        "change_pct": 0,
+        "close_price": 177,
+        "date": "2024-04-12",
+        "volume": "9200000"
+    },
+    {
+        "change_amt": -1.5,
+        "change_pct": -0.847457627118644,
+        "close_price": 175.5,
+        "date": "2024-04-11",
+        "volume": "9100000"
+    },
+    {
+        "change_amt": -1.5,
+        "change_pct": -0.8547008547008548,
+        "close_price": 174,
+        "date": "2024-04-10",
+        "volume": "8900000"
+    },
+    {
+        "change_amt": -1,
+        "change_pct": -0.5747126436781609,
+        "close_price": 173,
+        "date": "2024-04-09",
+        "volume": "8800000"
+    },
+    {
+        "change_amt": -0.5,
+        "change_pct": -0.2890173410404624,
+        "close_price": 172.5,
+        "date": "2024-04-08",
+        "volume": "8700000"
+    },
+    {
+        "change_amt": -1.5,
+        "change_pct": -0.8695652173913043,
+        "close_price": 171,
+        "date": "2024-04-07",
+        "volume": "8600000"
+    },
+    {
+        "change_amt": 0.5,
+        "change_pct": 0.29239766081871343,
+        "close_price": 171.5,
+        "date": "2024-04-06",
+        "volume": "9000000"
+    }
+]
+    }
 
 if __name__ == '__main__':
     with app.app_context():       

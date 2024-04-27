@@ -11,7 +11,7 @@
 </head>
 <body>
     <div class="nav-bar bg-primary">
-        <h3>Chat Advisor</h3>
+        <h3>Financial Advisor</h3>
         <div class="option">
             <a href="{{ url_for('profile') }}">Profile</a>
             <a href="{{ url_for('logout') }}">Log Out</a>
@@ -19,24 +19,31 @@
     </div>
     <div class="content">
         <div class="chat-container">
-            <div class="card">
-                <h5>Talk with the bot!</h5>
-                <div class="card-body">
-                    <div class="chat-messages">
-                        {% for message in chat_messages %}
-                            {% if message.sender == 'user' %}
-                            <div class="message message__user">{{ message.message }}</div>
-                            {% else %}
-                            <div class="message message__bot">{{ message.message }}</div>
-                            {% endif %}
-                        {% endfor %}
+           <h5>Hello, I am your friendly financial advisor bot!. I am here to help you navigate the finance world and help you make better decisions!</h5>
+           <h6>Pleas write your questions or queries below for response!</h6>
+           <div>
+                <input type="text" id="query">
+                <button class="btn btn-primary" onclick="sendQuery()">Send</button>
+
+                <div id="processing-query" style="display: none;">Processing Query.....</div>
+                <div id="generated-response">
+                    <div id="stock-table-container">
+                        <div>Here are the last seven days prices: </div>
+                        <table border="2" id="stock-table">
+                            <thead>
+                                <th>Date</th>
+                                <th>Change Amount</th>
+                                <th>Change PCT</th>
+                                <th>Closed Price</th>
+                                <th>Volume</th>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
-                    <form action="/" method="POST">
-                        <input type="text" id="query" name="query" required>
-                        <button class="btn btn-primary">Send</button>
-                    </form>
+                    <div id="sentiment-container" class="d-flex">
+                    </div>
                 </div>
-            </div>
+           </div>
         </div>
         <div class="card stocks-container">
             <h3>Your Personalised Stocks Info:</h3>
@@ -67,7 +74,6 @@
             
         </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const news_loading = document.getElementById('news_loading');
@@ -140,6 +146,72 @@
                     alert('An error occurred while fetching data.');
                 });
         });
+
+        function sendQuery() {
+            const processing_div = document.getElementById('processing-query')
+            processing_div.style.display = 'block';
+
+            query = document.getElementById('query').value;
+            fetch('/send-query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+              show_generated_table(data['stock_response'])
+              show_sentiment(data['news_result']['combined_sentiment'])
+              processing_div.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function show_generated_table(stocks) {
+            stock_table = document.getElementById("stock-table");
+
+            const tbody = stock_table.querySelector('tbody');
+                
+            if (stocks.length) {
+            stocks.forEach(stock => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stock.date}</td>
+                    <td>${stock.change_amt}</td>
+                    <td>${stock.change_pct}</td>
+                    <td>${stock.close_price}</td>
+                    <td>${stock.volume}</td>
+                `;
+                tbody.appendChild(row);
+            });
+                stock_table.style.display = 'table';
+                stocks_loading.style.display = 'none';
+            } else {
+                stocks_loading.innerText = "No Stock Data Available. Please update your profile"
+            }
+        }
+
+        function show_sentiment(sentiment){
+            const sentiment_container = document.getElementById('sentiment-container')
+
+            sentiment_container.innerHTML = `
+                <div class="card">
+                    <div class="card_header">Overall Sentiment</div>
+                    <div class="card-body">
+                        <div>${sentiment.sentiment}</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card_header">Confidence</div>
+                    <div class="card-body">
+                        <div>${sentiment.confidence}</div>
+                    </div>
+                </div>
+            `
+        }
     </script>
 </body>
 </html>
