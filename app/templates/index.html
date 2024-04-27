@@ -18,15 +18,18 @@
         </div>
     </div>
     <div class="content">
-        <div class="chat-container">
-           <h5>Hello, I am your friendly financial advisor bot!. I am here to help you navigate the finance world and help you make better decisions!</h5>
-           <h6>Pleas write your questions or queries below for response!</h6>
-           <div>
-                <input type="text" id="query">
+        <div class="chat-container card p-2">
+           <h5 class="mb-3">Hello, I am your friendly financial advisor bot!. I am here to help you navigate the finance world and help you make better decisions!</h5>
+           <div class="chat-form">
+                <input type="text" id="query" placeholder="Enter your query here!" required>
                 <button class="btn btn-primary" onclick="sendQuery()">Send</button>
-
-                <div id="processing-query" style="display: none;">Processing Query.....</div>
-                <div id="generated-response">
+           </div>
+           <div class="response-container p-2 d-flex flex-column m-auto">
+                <div id="processing-query" style="display: none;"  class="spinner-border text-primary" role="status"></div>
+                <div id="generated-response" style="display: none;" class="p-2">
+                    <div id="advice" class="mb-2"></div>
+                    <div id="sentiment-container" class="d-flex mb-4">
+                    </div>
                     <div id="stock-table-container">
                         <div>Here are the last seven days prices: </div>
                         <table border="2" id="stock-table">
@@ -39,8 +42,6 @@
                             </thead>
                             <tbody></tbody>
                         </table>
-                    </div>
-                    <div id="sentiment-container" class="d-flex">
                     </div>
                 </div>
            </div>
@@ -161,13 +162,32 @@
             })
             .then(response => response.json())
             .then(data => {
-              show_generated_table(data['stock_response'])
-              show_sentiment(data['news_result']['combined_sentiment'])
               processing_div.style.display = 'none';
+              document.getElementById('generated-response').style.display = 'block'
+              show_advice(data['advice'])
+              show_generated_table(data['stock_response'])
+              show_sentiment(data['news_result'])
+              
             })
             .catch(error => {
                 console.error('Error:', error);
             });
+        }
+
+        function show_advice(advice) {
+            const advice_div = document.getElementById('advice')
+
+            function printCharacterByCharacter(text, delay) {
+                let index = 0;
+                const interval = setInterval(function() {
+                if (index < text.length) {
+                    advice_div.textContent += text[index++];
+                } else {
+                    clearInterval(interval); // Stop the interval when all characters are printed
+                }
+                }, delay);
+            }
+            printCharacterByCharacter(advice, 100);
         }
 
         function show_generated_table(stocks) {
@@ -194,11 +214,14 @@
             }
         }
 
-        function show_sentiment(sentiment){
+        function show_sentiment(news_result){
+            const sentiment = news_result['combined_sentiment']
+            const new_summaries = news_result['summaries']
             const sentiment_container = document.getElementById('sentiment-container')
 
             sentiment_container.innerHTML = `
-                <div class="card">
+                <div class="d-flex flex-column">
+                <div class="card mb-2">
                     <div class="card_header">Overall Sentiment</div>
                     <div class="card-body">
                         <div>${sentiment.sentiment}</div>
@@ -210,7 +233,20 @@
                         <div>${sentiment.confidence}</div>
                     </div>
                 </div>
+                </div>
+
+                <div class="p-2 news-summaries">
+                    <div>Recent News Summaries: </div>
+                    <ul id="summary-list">
+                    </ul> 
+                </div>
             `
+
+            new_summaries.forEach(summary => {
+                const summary_line = document.createElement('li')
+                summary_line.innerText = summary
+                document.getElementById("summary-list").appendChild(summary_line)
+            })
         }
     </script>
 </body>

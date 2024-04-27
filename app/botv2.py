@@ -259,7 +259,11 @@ def handle_financial_tasks(text):
     labels = ['negative', 'neutral', 'positive']
     label_index = torch.argmax(prediction).item()
     confidence = prediction[0][label_index].item()
-    return f"Sentiment: {labels[label_index]}, Confidence: {confidence:.2f}"
+    return {
+        'sentiment': labels[label_index],
+        'confidence': f"{confidence:.2f}"
+    }
+    # return f"Sentiment: {labels[label_index]}, Confidence: {confidence:.2f}"
 
 
 # distilbart-cnn-12-6 for summarization
