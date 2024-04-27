@@ -2,3 +2,5 @@ app/__pycache__
 app/instance
 app/static/.webassets-cache
 app/static/gen
+app/sentiment_analysis/__pycache__
+app/sentiment_analysis/sentiment-model/model.safetensors

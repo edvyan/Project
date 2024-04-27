@@ -1,5 +1,4 @@
 {
-  "_name_or_path": "sshleifer/distilbart-cnn-12-6",
   "_num_labels": 3,
   "activation_dropout": 0.0,
   "activation_function": "gelu",
@@ -70,8 +69,7 @@
       "num_beams": 4
     }
   },
-  "torch_dtype": "float32",
-  "transformers_version": "4.39.3",
+  "transformers_version": "4.7.0.dev0",
   "use_cache": true,
   "vocab_size": 50264
 }

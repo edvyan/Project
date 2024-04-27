@@ -179,7 +179,7 @@ def index():
                 'sender': 'user',
                 'message': query
             })
-            response = "Test" #generate_response(query)
+            response = generate_response(query)
             chat_messages.insert(0, {
                 'sender': 'bot',
                 'message': response
