@@ -30,7 +30,7 @@ app.layout = dbc.Container([
             dcc.Input(
                 id='user-input',
                 type='text',
-                placeholder='Type your message here...',
+                placeholder='Type your message here...e.g. Apple',
                 style={'width': '90%', 'height': '50px'}, 
                 n_submit=0,
                 value=''
