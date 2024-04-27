@@ -154,9 +154,31 @@ def index():
     # Check if user is logged in
     if 'user' in session:
         user = session['user']
-        # Access user attributes as needed
-        firstname = user['firstname']
-        lastname = user['lastname']
+        if request.method == 'POST':
+            query = request.form['query']
+            print(query)
+            chat_messages.insert(0, {
+                'sender': 'user',
+                'message': query
+            })
+            response = generate_response(query)
+            chat_messages.insert(0, {
+                'sender': 'bot',
+                'message': response
+            })
+        return render_template('index.html', user=user, chat_messages=chat_messages)
+    else:
+        return redirect(url_for('login'))
+    
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
+
+@app.route('/personalised-content')
+def personalised_content():
+    if 'user' in session:
+        user = session['user']
 
         all_companies = Company.query.all()
         companies = [company.to_dict() for company in all_companies]
@@ -170,28 +192,14 @@ def index():
         
         for news in personalised_news:
             news['publishedAt'] = format_datetime(news['publishedAt'])
-        
-        # Render the template
-        if request.method == 'POST':
-            query = request.form['query']
-            print(query)
-            chat_messages.insert(0, {
-                'sender': 'user',
-                'message': query
-            })
-            response = "Test" #generate_response(query)
-            chat_messages.insert(0, {
-                'sender': 'bot',
-                'message': response
-            })
-        return render_template('index.html', user=user, personalised_news=personalised_news, personalised_stocks=personalised_stocks, chat_messages=chat_messages)
-    else:
-        return redirect(url_for('login'))
+
+        return {
+            'news': personalised_news,
+            'stocks': personalised_stocks
+        }
     
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
     return redirect(url_for('login'))
+
 
 if __name__ == '__main__':
     with app.app_context():       

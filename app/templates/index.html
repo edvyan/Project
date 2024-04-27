@@ -42,54 +42,104 @@
             <h3>Your Personalised Stocks Info:</h3>
             <div class="card-body">
                 <h4>Latest Market Figures</h4><br>
-                <table border="2">
+                <div id="stocks_loading">Loading...</div>
+                <table border="2" id="stocks-table" style="display: none;">
                     <thead>
-                      <th>Name</th>
-                      <th>Symbol</th>
-                      <th>Open</th>
-                      <th>High</th>
-                      <th>Low</th>
-                      <th>Close</th>
-                      <th>Volume</th>
-                      <th>Last Updated</th>
+                        <th>Name</th>
+                        <th>Symbol</th>
+                        <th>Open</th>
+                        <th>High</th>
+                        <th>Low</th>
+                        <th>Close</th>
+                        <th>Volume</th>
+                        <th>Last Updated</th>
                     </thead>
-                    <tbody>
-                        {% for data in personalised_stocks %}
-                        <tr>
-                            <td>{{ data.Name }}</td>
-                            <td>{{data.Symbol}}</td>
-                            <td>{{data.open}}</td>
-                            <td>{{data.high}}</td>
-                            <td>{{data.low}}</td>
-                            <td>{{data.close}}</td>
-                            <td>{{data.volume}}</td>
-                            <td>{{data.last_updated}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                  </table>
+                    <tbody></tbody>
+                </table>
                 <br/>
                 <br/>
                 <hr>
                 <h4>News Articles</h4>
-                <div class="news-container">
-                    {% for article in personalised_news %}
-                        <div class="article">
-                            <h5>{{ article.title }}</h5>
-                            <p>{{ article.description }}</p>
-                            <p>Published At: {{ article.publishedAt }}</p>
-                            {% if article.url %}
-                                <a href="{{article.url}}" target="_blank">Visit Source</a>
-                                <!-- <img src="{{ article.image }}" alt="Article Image"> -->
-                            {% endif %}
-                        </div>
-                        </br>
-                        <hr>
-                    {% endfor %}
+                <div id="news_loading">Loading...</div>
+                <div class="news-container" id="news-container">
                 </div>
             </div>
             
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const news_loading = document.getElementById('news_loading');
+            const stocks_loading = document.getElementById('stocks_loading')
+            const table = document.getElementById('stocks-table');
+            const news_list = document.getElementById('news-container')
+
+            // Fetch data from the server using AJAX
+            fetch('/personalised-content')
+                .then(response => response.json())
+                .then(data => {
+                    
+                    // Show table
+                    table.style.display = 'table';
+
+                    // Populate table with data
+                    console.log(data)
+                    news = data['news']
+                    stocks = data['stocks']
+                    
+                    const tbody = table.querySelector('tbody');
+                    
+                    if (stocks.length) {
+                        stocks.forEach(stock => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${stock.Name}</td>
+                                <td>${stock.Symbol}</td>
+                                <td>${stock.open}</td>
+                                <td>${stock.high}</td>
+                                <td>${stock.low}</td>
+                                <td>${stock.close}</td>
+                                <td>${stock.volume}</td>
+                                <td>${stock.last_updated}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                        stocks_loading.style.display = 'none';
+                    } else {
+                        stocks_loading.innerText = "No Stock Data Available. Please update your profile"
+                    }
+
+                    if (news.length) {
+                        news.forEach(article => {
+                            const articleDiv = document.createElement('div');
+                            articleDiv.classList.add('article');
+                            articleDiv.innerHTML = `
+                                <h5>${article.title}</h5>
+                                <p>${article.description}</p>
+                                <p>Published At: ${article.publishedAt}</p>
+                                ${article.url ? `<a href="${article.url}" target="_blank">Visit Source</a>` : ''}
+                            `;
+                            news_list.appendChild(articleDiv);
+                            news_list.appendChild(document.createElement('hr'));
+                        });
+
+                        news_loading.style.display = 'none';
+                    } else {
+                        news_loading.innerText = 'No news available. Please update your profile'
+                    }
+
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Hide loading indicator
+                    news_loading.style.display = 'none';
+                    stocks_loading.style.display = 'none';
+                    // Display error message
+                    alert('An error occurred while fetching data.');
+                });
+        });
+    </script>
 </body>
 </html>
