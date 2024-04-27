@@ -4,9 +4,10 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, AutoModelForToken
 import nltk
 import pandas as pd
 from fuzzywuzzy import process
-import requests  
+import requests  # Not used as we simulate API reading
 from bs4 import BeautifulSoup
 import re
+import spacy
 
 # NLTK
 nltk.download('punkt')
@@ -19,9 +20,10 @@ gpt_model = AutoModelForCausalLM.from_pretrained('gpt2')
 if gpt_tokenizer.pad_token is None:
     gpt_tokenizer.pad_token = gpt_tokenizer.eos_token
     
-# finBERT for financial classification tasks
-finbert_tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finBERT")
-finbert_model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finBERT")
+# finBERT model for sentiment analysis, tuned
+finBERT_model_path = './sentiment_analysis/sentiment-model'
+finbert_model = AutoModelForSequenceClassification.from_pretrained(finBERT_model_path)
+finbert_tokenizer = AutoTokenizer.from_pretrained(finBERT_model_path)
 
 # Load NER model
 model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
@@ -84,7 +86,7 @@ def fetch_stock_data(ticker):
         daily_data = data['Time Series (Daily)']
         recent_dates = sorted(daily_data.keys(), reverse=True)[:7]  # Last 7 days
 
-        markdown_table = f"Here is the stock data for {ticker} over the last 7 days:\n"
+        markdown_table = f"NASDAQ: {ticker}\n"
         markdown_table += "| Date       | Close  | Change Amt | Change % | Volume     |\n"
         markdown_table += "|------------|--------|------------|----------|------------|\n"
 
@@ -229,16 +231,35 @@ def handle_financial_tasks(text):
 
 
 # distilbart-cnn-12-6 for summarization
-model_path = '../model/distilbart-cnn-12-6'
-distilbart_tokenizer = AutoTokenizer.from_pretrained(model_path)
-distilbart_model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+# model_path = '../model/distilbart-cnn-12-6'
+distilbart_model_path = 'sshleifer/distilbart-cnn-12-6'
+distilbart_tokenizer = AutoTokenizer.from_pretrained(distilbart_model_path)
+distilbart_model = AutoModelForSeq2SeqLM.from_pretrained(distilbart_model_path)
 
-# Summerization
+# English model
+nlp = spacy.load("en_core_web_sm")
+
+# Summarization
 def summarize_content(content):
-    inputs = distilbart_tokenizer(content, return_tensors="pt", max_length=500, truncation=True)
-    summary_ids = distilbart_model.generate(inputs['input_ids'], max_length=38, min_length=12, length_penalty=1.0, num_beams=4, early_stopping=True)
+    # Generate the summary
+    inputs = distilbart_tokenizer(content, return_tensors="pt", max_length=512, truncation=True)
+    summary_ids = distilbart_model.generate(
+        inputs['input_ids'], 
+        max_length=150,  # Significantly increased max length
+        min_length=60,   # Adjusted minimum length to ensure more complete information
+        length_penalty=2.0,  # Length penalty to encourage fuller summaries
+        num_beams=4,
+        no_repeat_ngram_size=3,  # Helps prevent repetitive phrases
+        early_stopping=True
+    )
     summary = distilbart_tokenizer.decode(summary_ids[0], skip_special_tokens=True)
-    return summary
+
+    # Clean the summary using SpaCy
+    doc = nlp(summary)
+    complete_sentences = [sent.text.strip() for sent in doc.sents if len(sent.text.strip()) > 0]
+    final_summary = ' '.join(complete_sentences)
+
+    return final_summary
 
 def summarize_and_analyze_news(file_path):
     try:
@@ -306,22 +327,31 @@ def handle_full_request(input_text):
 
     # Step 5: Compile the response
     response = f"Stock Data for {company_name} - Last 7 Days:\n{stock_response}\n\n"
-    response += "News Summaries:\n"
+    response += "Recent News Summaries:\n"
     for idx, summary in enumerate(news_result['summaries'], 1):
         response += f"{idx}: {summary}\n"
-    response += f"\nCombined Sentiment Analysis: {news_result['combined_sentiment']}\n"
+    response += f"\nMarket Sentiment Analysis: {news_result['combined_sentiment']}\n"
     response += f"\nInvestment Advice: {advice}"
     
     return response
 
+# Advice function
 def generate_investment_advice(sentiment_analysis):
-    sentiment, confidence = sentiment_analysis.split(", ")
-    advice = "Hold"
-    if "positive" in sentiment and float(confidence.split(": ")[1]) > 0.6:
-        advice = "Buy"
-    elif "negative" in sentiment and float(confidence.split(": ")[1]) > 0.6:
-        advice = "Sell"
-    return f"Based on sentiment analysis, we recommend to {advice}."
+    try:
+        parts = {key.strip(): float(value.strip()) if key == "Confidence" else value.strip() 
+                 for part in sentiment_analysis.split(",") 
+                 for key, value in [part.split(":")]}
+        sentiment = parts.get("Sentiment")
+        confidence = parts.get("Confidence", 0.0) 
+        advice = "Hold"
+        if sentiment == "positive" and confidence > 0.9:
+            advice = "Buy"
+        elif sentiment == "negative" and confidence > 0.9:
+            advice = "Sell"
+        return f"Based on current market sentiment analysis, we recommend to {advice}."
+    except Exception as e:
+        print(f"Error processing sentiment analysis: {str(e)}")
+        return "Error in generating investment advice."
 
 # Chatbot logic
 def generate_response(input_text):
@@ -336,7 +366,7 @@ def generate_response(input_text):
     # extract and handle stock and news requests
     company_names = extract_company_names(input_text)
     if company_names:
-        company_name = company_names[0]  # Assume the first extracted name is the target
+        company_name = company_names[0] 
         response = handle_full_request(company_name)
         return response
 
