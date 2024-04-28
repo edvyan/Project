@@ -10,30 +10,29 @@ import re
 import spacy
 from config import config
 
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+from sentiment_analysis.determine_sentiment import SentimentAnalysis
+
 # NLTK
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
 # GPT2 model for general conversation
-gpt_tokenizer = AutoTokenizer.from_pretrained('gpt2')
-gpt_model = AutoModelForCausalLM.from_pretrained('gpt2')
+# gpt_tokenizer = AutoTokenizer.from_pretrained('../model/gpt2')
+# gpt_model = AutoModelForCausalLM.from_pretrained('../model/gpt2')
 # Set the pad token to the eos token if it's not already set
-if gpt_tokenizer.pad_token is None:
-    gpt_tokenizer.pad_token = gpt_tokenizer.eos_token
+# if gpt_tokenizer.pad_token is None:
+    # gpt_tokenizer.pad_token = gpt_tokenizer.eos_token
     
-# finBERT model for sentiment analysis, tuned
-finBERT_model_path = './sentiment_analysis/sentiment-model'
-finbert_model = AutoModelForSequenceClassification.from_pretrained(finBERT_model_path)
-finbert_tokenizer = AutoTokenizer.from_pretrained(finBERT_model_path)
-
 # Load NER model
-model_name = "dbmdz/bert-large-cased-finetuned-conll03-english"
+model_name = "../model/bert-large-cased-finetuned-conll03-english"
 bert_tokenizer = AutoTokenizer.from_pretrained(model_name)
-bert_model = AutoModelForTokenClassification.from_pretrained(model_name)
-
 
 # Function for extract company name from NL
 def extract_company_names(text):
+    bert_model = AutoModelForTokenClassification.from_pretrained(model_name)
     inputs = bert_tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
     outputs = bert_model(**inputs)
     predictions = torch.argmax(outputs.logits, dim=2)
@@ -59,12 +58,11 @@ def extract_company_names(text):
     return list(set(entities))
 
 
-# Load CSV file and process data
-df_stocks = pd.read_csv('../data/stock/stock.csv')
-df_stocks['Normalized Company Name'] = df_stocks['Company Name'].str.lower().replace('[^a-zA-Z0-9 ]', '', regex=True)
-
 # Function for mapping company name to stock ticker
 def map_entities_to_tickers(entities):
+    # Load CSV file and process data
+    df_stocks = pd.read_csv('../data/stock/stock.csv')
+    df_stocks['Normalized Company Name'] = df_stocks['Company Name'].str.lower().replace('[^a-zA-Z0-9 ]', '', regex=True)
     entity_ticker_map = {}
     for entity in entities:
         normalized_entity = entity.lower().replace('[^a-zA-Z0-9]', '')
@@ -76,10 +74,10 @@ def map_entities_to_tickers(entities):
             entity_ticker_map[entity] = "Ticker not found"
     return entity_ticker_map
 
-def fetch_stock_data(ticker):
-    url = f"{config['stock_api']['url']}{ticker}&apikey={config['stock_api']['api_key']}"
-    response = requests.get(url)
-    data = response.json()
+# def fetch_stock_data(ticker):
+#     url = f"{config['stock_api']['url']}{ticker}&apikey={config['stock_api']['api_key']}"
+#     response = requests.get(url)
+#     data = response.json()
 
 # Fetch stock data
 def fetch_stock_data(ticker):
@@ -194,9 +192,7 @@ def fetch_and_summarize_news(company):
     data = response.json()
 
 
-import numpy as np
-from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
+
 
 # Function for stock prediction 
 def predict_next_day_stock_price(dates, prices):
@@ -295,30 +291,39 @@ def get_personalised_stock_info(company):
     
 # Function for sentiment analysis
 def handle_financial_tasks(text):
-    inputs = finbert_tokenizer(text, return_tensors="pt", padding=True, truncation=True)
-    outputs = finbert_model(**inputs)
-    prediction = torch.nn.functional.softmax(outputs.logits, dim=-1)
-    labels = ['negative', 'neutral', 'positive']
-    label_index = torch.argmax(prediction).item()
-    confidence = prediction[0][label_index].item()
-    return {
-        'sentiment': labels[label_index],
-        'confidence': f"{confidence:.2f}"
-    }
+    # finBERT model for sentiment analysis, tuned
+    # finBERT_model_path = './sentiment_analysis/sentiment-model'
+    # finbert_model = AutoModelForSequenceClassification.from_pretrained(finBERT_model_path)
+    # finbert_tokenizer = AutoTokenizer.from_pretrained(finBERT_model_path)
+    # inputs = finbert_tokenizer(text, return_tensors="pt", padding=True, truncation=True)
+    # outputs = finbert_model(**inputs)
+    # prediction = torch.nn.functional.softmax(outputs.logits, dim=-1)
+    # labels = ['negative', 'neutral', 'positive']
+    # label_index = torch.argmax(prediction).item()
+    # confidence = prediction[0][label_index].item()
+    # return {
+    #     'sentiment': labels[label_index],
+    #     'confidence': f"{confidence:.2f}"
+    # }
     # return f"Sentiment: {labels[label_index]}, Confidence: {confidence:.2f}"
+    sentment_analyser = SentimentAnalysis()
+    sentiment = sentment_analyser.determine_sentiment(text)
+    return sentiment
 
 
-# distilbart-cnn-12-6 for summarization
-# model_path = '../model/distilbart-cnn-12-6'
-distilbart_model_path = 'sshleifer/distilbart-cnn-12-6'
-distilbart_tokenizer = AutoTokenizer.from_pretrained(distilbart_model_path)
-distilbart_model = AutoModelForSeq2SeqLM.from_pretrained(distilbart_model_path)
+
 
 # English model
 nlp = spacy.load("en_core_web_sm")
 
+
+# model_path = '../model/distilbart-cnn-12-6'
+distilbart_model_path = '../model/distilbart-cnn-12-6'
+distilbart_tokenizer = AutoTokenizer.from_pretrained(distilbart_model_path)
+distilbart_model = AutoModelForSeq2SeqLM.from_pretrained(distilbart_model_path)
 # Summarization
 def summarize_content(content):
+    # distilbart-cnn-12-6 for summarization
     # Generate the summary
     inputs = distilbart_tokenizer(content, return_tensors="pt", max_length=512, truncation=True)
     summary_ids = distilbart_model.generate(
@@ -383,13 +388,24 @@ def handle_full_request(input_text):
     # Step 1: Extract company name from user input
     company_names = extract_company_names(input_text)
     if not company_names:
-        return "No company identified. Please mention the company explicitly."
+        
+        # return "No company identified. Please mention the company explicitly."
+        return  {
+        'stock_response': "No company identified. Please mention the company explicitly.",
+        'news_result': '',
+        'advice': ''
+        }
     
     company_name = company_names[0] 
     company_ticker = map_entities_to_tickers([company_name]).get(company_name, None)
     
     if not company_ticker or company_ticker == "Ticker not found":
-        return f"No ticker found for {company_name}."
+        return  {
+        'stock_response': f"No ticker found for {company_name}.",
+        'news_result': '',
+        'advice': ''
+        }
+        # return f"No ticker found for {company_name}."
 
     # Step 2: Fetch and display the stock data
     stock_data = fetch_recent_stock_data(company_ticker)
@@ -398,7 +414,11 @@ def handle_full_request(input_text):
     news_file_path = f'../data/news_data/{company_name.lower()}.json'
     news_result = summarize_and_analyze_news(news_file_path)
     if "error" in news_result:
-        return news_result["error"]
+        return  {
+        'stock_response': news_result["error"],
+        'news_result': '',
+        'advice': ''
+        }
 
     # Step 4: Generate investment advice
     advice = generate_investment_advice(news_result['combined_sentiment'])
@@ -410,7 +430,6 @@ def handle_full_request(input_text):
     #     response += f"{idx}: {summary}\n"
     # response += f"\nMarket Sentiment Analysis: {news_result['combined_sentiment']}\n"
     # response += f"\nInvestment Advice: {advice}"
-    
     return {
         'stock_response': stock_data,
         'news_result': news_result,
@@ -419,12 +438,15 @@ def handle_full_request(input_text):
 
 # Advice function
 def generate_investment_advice(sentiment_analysis):
+
     try:
-        parts = {key.strip(): float(value.strip()) if key == "Confidence" else value.strip() 
-                 for part in sentiment_analysis.split(",") 
-                 for key, value in [part.split(":")]}
-        sentiment = parts.get("Sentiment")
-        confidence = parts.get("Confidence", 0.0) 
+        # parts = {key.strip(): float(value.strip()) if key == "Confidence" else value.strip() 
+        #          for part in sentiment_analysis.split(",") 
+        #          for key, value in [part.split(":")]}
+        # sentiment = parts.get("Sentiment")
+        # confidence = parts.get("Confidence", 0.0)     
+        sentiment = sentiment_analysis['sentiment']
+        confidence = sentiment_analysis['confidence']
         advice = "Hold"
         if sentiment == "positive" and confidence > 0.9:
             advice = "Buy"
@@ -443,10 +465,16 @@ def generate_response(input_text):
     # check for greeting responses
     predefined_resp = get_predefined_response(input_text)
     if predefined_resp:
-        return predefined_resp
+        return  {
+        'stock_response': predefined_resp,
+        'news_result': '',
+        'advice': ''
+        }
+        # return predefined_resp
 
     # extract and handle stock and news requests
     company_names = extract_company_names(input_text)
+    print(company_names)
     if company_names:
         company_name = company_names[0] 
         response = handle_full_request(company_name)

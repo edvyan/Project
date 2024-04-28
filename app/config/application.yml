@@ -1,9 +1,9 @@
 news_api:
-  api_key: c347856255d54313bb339a8b8f69879f
+  api_key: 1a7e4877f1de41d8b0b8e6472680851b
   url: https://newsapi.org/v2/everything?q=
 
 stock_api:
-  api_key: TVH9BT39ERIA8S7L
+  api_key:  I48W76T4BMWHXTHA
   url: https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=
 
 

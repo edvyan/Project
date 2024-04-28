@@ -161,6 +161,7 @@
                 body: JSON.stringify({ query: query }),
             })
             .then(response => response.json())
+            // console.log(response.json())
             .then(data => {
               processing_div.style.display = 'none';
               document.getElementById('generated-response').style.display = 'block'
@@ -171,6 +172,8 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+                response => response.json()
+                document.getElementById('generated-response').style.display = 'block'
             });
         }
 

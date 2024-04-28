@@ -211,7 +211,7 @@ if __name__ == '__main__':
         db.create_all()
 
         if (len(Company.query.all()) < 1):
-            with open('../data/stock.csv', 'r') as file:
+            with open('../data/stock/stock.csv', 'r') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
                     code = row['Symbol']
