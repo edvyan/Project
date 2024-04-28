@@ -11,85 +11,243 @@
 </head>
 <body>
     <div class="nav-bar bg-primary">
-        <h3>Chat Advisor</h3>
+        <h3>Financial Advisor</h3>
         <div class="option">
             <a href="{{ url_for('profile') }}">Profile</a>
             <a href="{{ url_for('logout') }}">Log Out</a>
         </div>
     </div>
     <div class="content">
-        <div class="chat-container">
-            <div class="card">
-                <h5>Talk with the bot!</h5>
-                <div class="card-body">
-                    <div class="chat-messages">
-                        {% for message in chat_messages %}
-                            {% if message.sender == 'user' %}
-                            <div class="message message__user">{{ message.message }}</div>
-                            {% else %}
-                            <div class="message message__bot">{{ message.message }}</div>
-                            {% endif %}
-                        {% endfor %}
+        <div class="chat-container card p-2">
+           <h5 class="mb-3">Hello, I am your friendly financial advisor bot!. I am here to help you navigate the finance world and help you make better decisions!</h5>
+           <div class="chat-form">
+                <input type="text" id="query" placeholder="Enter your query here!" required>
+                <button class="btn btn-primary" onclick="sendQuery()">Send</button>
+           </div>
+           <div class="response-container p-2 d-flex flex-column m-auto">
+                <div id="processing-query" style="display: none;"  class="spinner-border text-primary" role="status"></div>
+                <div id="generated-response" style="display: none;" class="p-2">
+                    <div id="advice" class="mb-2"></div>
+                    <div id="sentiment-container" class="d-flex mb-4">
                     </div>
-                    <form action="/" method="POST">
-                        <input type="text" id="query" name="query" required>
-                        <button class="btn btn-primary">Send</button>
-                    </form>
+                    <div id="stock-table-container">
+                        <div>Here are the last seven days prices: </div>
+                        <table border="2" id="stock-table">
+                            <thead>
+                                <th>Date</th>
+                                <th>Change Amount</th>
+                                <th>Change PCT</th>
+                                <th>Closed Price</th>
+                                <th>Volume</th>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+           </div>
         </div>
         <div class="card stocks-container">
             <h3>Your Personalised Stocks Info:</h3>
             <div class="card-body">
                 <h4>Latest Market Figures</h4><br>
-                <table border="2">
+                <div id="stocks_loading">Loading...</div>
+                <table border="2" id="stocks-table" style="display: none;">
                     <thead>
-                      <th>Name</th>
-                      <th>Symbol</th>
-                      <th>Open</th>
-                      <th>High</th>
-                      <th>Low</th>
-                      <th>Close</th>
-                      <th>Volume</th>
-                      <th>Last Updated</th>
+                        <th>Name</th>
+                        <th>Symbol</th>
+                        <th>Open</th>
+                        <th>High</th>
+                        <th>Low</th>
+                        <th>Close</th>
+                        <th>Volume</th>
+                        <th>Last Updated</th>
                     </thead>
-                    <tbody>
-                        {% for data in personalised_stocks %}
-                        <tr>
-                            <td>{{ data.Name }}</td>
-                            <td>{{data.Symbol}}</td>
-                            <td>{{data.open}}</td>
-                            <td>{{data.high}}</td>
-                            <td>{{data.low}}</td>
-                            <td>{{data.close}}</td>
-                            <td>{{data.volume}}</td>
-                            <td>{{data.last_updated}}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                  </table>
+                    <tbody></tbody>
+                </table>
                 <br/>
                 <br/>
                 <hr>
                 <h4>News Articles</h4>
-                <div class="news-container">
-                    {% for article in personalised_news %}
-                        <div class="article">
-                            <h5>{{ article.title }}</h5>
-                            <p>{{ article.description }}</p>
-                            <p>Published At: {{ article.publishedAt }}</p>
-                            {% if article.url %}
-                                <a href="{{article.url}}" target="_blank">Visit Source</a>
-                                <!-- <img src="{{ article.image }}" alt="Article Image"> -->
-                            {% endif %}
-                        </div>
-                        </br>
-                        <hr>
-                    {% endfor %}
+                <div id="news_loading">Loading...</div>
+                <div class="news-container" id="news-container">
                 </div>
             </div>
             
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const news_loading = document.getElementById('news_loading');
+            const stocks_loading = document.getElementById('stocks_loading')
+            const table = document.getElementById('stocks-table');
+            const news_list = document.getElementById('news-container')
+
+            // Fetch data from the server using AJAX
+            fetch('/personalised-content')
+                .then(response => response.json())
+                .then(data => {
+                    
+                    // Show table
+                    table.style.display = 'table';
+
+                    // Populate table with data
+                    console.log(data)
+                    news = data['news']
+                    stocks = data['stocks']
+                    
+                    const tbody = table.querySelector('tbody');
+                    
+                    if (stocks.length) {
+                        stocks.forEach(stock => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${stock.Name}</td>
+                                <td>${stock.Symbol}</td>
+                                <td>${stock.open}</td>
+                                <td>${stock.high}</td>
+                                <td>${stock.low}</td>
+                                <td>${stock.close}</td>
+                                <td>${stock.volume}</td>
+                                <td>${stock.last_updated}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                        stocks_loading.style.display = 'none';
+                    } else {
+                        stocks_loading.innerText = "No Stock Data Available. Please update your profile"
+                    }
+
+                    if (news.length) {
+                        news.forEach(article => {
+                            const articleDiv = document.createElement('div');
+                            articleDiv.classList.add('article');
+                            articleDiv.innerHTML = `
+                                <h5>${article.title}</h5>
+                                <p>${article.description}</p>
+                                <p>Published At: ${article.publishedAt}</p>
+                                ${article.url ? `<a href="${article.url}" target="_blank">Visit Source</a>` : ''}
+                            `;
+                            news_list.appendChild(articleDiv);
+                            news_list.appendChild(document.createElement('hr'));
+                        });
+
+                        news_loading.style.display = 'none';
+                    } else {
+                        news_loading.innerText = 'No news available. Please update your profile'
+                    }
+
+
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Hide loading indicator
+                    news_loading.style.display = 'none';
+                    stocks_loading.style.display = 'none';
+                    // Display error message
+                    alert('An error occurred while fetching data.');
+                });
+        });
+
+        function sendQuery() {
+            const processing_div = document.getElementById('processing-query')
+            processing_div.style.display = 'block';
+
+            query = document.getElementById('query').value;
+            fetch('/send-query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query }),
+            })
+            .then(response => response.json())
+            .then(data => {
+              processing_div.style.display = 'none';
+              document.getElementById('generated-response').style.display = 'block'
+              show_advice(data['advice'])
+              show_generated_table(data['stock_response'])
+              show_sentiment(data['news_result'])
+              
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function show_advice(advice) {
+            const advice_div = document.getElementById('advice')
+
+            function printCharacterByCharacter(text, delay) {
+                let index = 0;
+                const interval = setInterval(function() {
+                if (index < text.length) {
+                    advice_div.textContent += text[index++];
+                } else {
+                    clearInterval(interval); // Stop the interval when all characters are printed
+                }
+                }, delay);
+            }
+            printCharacterByCharacter(advice, 100);
+        }
+
+        function show_generated_table(stocks) {
+            stock_table = document.getElementById("stock-table");
+
+            const tbody = stock_table.querySelector('tbody');
+                
+            if (stocks.length) {
+            stocks.forEach(stock => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stock.date}</td>
+                    <td>${stock.change_amt}</td>
+                    <td>${stock.change_pct}</td>
+                    <td>${stock.close_price}</td>
+                    <td>${stock.volume}</td>
+                `;
+                tbody.appendChild(row);
+            });
+                stock_table.style.display = 'table';
+                stocks_loading.style.display = 'none';
+            } else {
+                stocks_loading.innerText = "No Stock Data Available. Please update your profile"
+            }
+        }
+
+        function show_sentiment(news_result){
+            const sentiment = news_result['combined_sentiment']
+            const new_summaries = news_result['summaries']
+            const sentiment_container = document.getElementById('sentiment-container')
+
+            sentiment_container.innerHTML = `
+                <div class="d-flex flex-column">
+                <div class="card mb-2">
+                    <div class="card_header">Overall Sentiment</div>
+                    <div class="card-body">
+                        <div>${sentiment.sentiment}</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card_header">Confidence</div>
+                    <div class="card-body">
+                        <div>${sentiment.confidence}</div>
+                    </div>
+                </div>
+                </div>
+
+                <div class="p-2 news-summaries">
+                    <div>Recent News Summaries: </div>
+                    <ul id="summary-list">
+                    </ul> 
+                </div>
+            `
+
+            new_summaries.forEach(summary => {
+                const summary_line = document.createElement('li')
+                summary_line.innerText = summary
+                document.getElementById("summary-list").appendChild(summary_line)
+            })
+        }
+    </script>
 </body>
 </html>

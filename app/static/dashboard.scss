@@ -17,6 +17,19 @@
 }
 
 .chat-container {
+    display: flex;
+    flex-direction: column;
+
+    .chat-form {
+        display: flex;
+        width: 100%;
+
+        input {
+            padding: 0.25rem;
+            width: -webkit-fill-available;
+        }
+    }
+
     .card {
         padding: 1rem;
     }
@@ -61,6 +74,11 @@
             width: 100%;
         }
     }
+}
+
+.news-summaries {
+    max-height: 25rem;
+    overflow-y: scroll;
 }
 
 .stocks-container {

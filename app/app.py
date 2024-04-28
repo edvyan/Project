@@ -39,6 +39,20 @@
 #         ],
 #         className="mb-3" 
 #     ),
+    # dbc.Row(
+    #     [
+    #         dcc.Input(
+    #             id='user-input',
+    #             type='text',
+    #             placeholder='Type your message here...e.g. Apple',
+    #             style={'width': '90%', 'height': '50px'}, 
+    #             n_submit=0,
+    #             value=''
+    #         ),
+    #         html.Button('Send', id='send-button', n_clicks=0, style={'height': '50px', 'width': '10%'}), 
+    #     ],
+    #     className="mb-3" 
+    # ),
 
 #     html.Div(id='company-context', style={'display': 'none'}),
 #     html.Div(id='ticker-context', style={'display': 'none'}),
