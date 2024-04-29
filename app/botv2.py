@@ -14,6 +14,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 from sentiment_analysis.determine_sentiment import SentimentAnalysis
+from ner.company_extrator import CompanyExtractor
 
 # NLTK
 nltk.download('punkt')
@@ -26,36 +27,36 @@ nltk.download('averaged_perceptron_tagger')
 # if gpt_tokenizer.pad_token is None:
     # gpt_tokenizer.pad_token = gpt_tokenizer.eos_token
     
-# Load NER model
-model_name = "../model/bert-large-cased-finetuned-conll03-english"
-bert_tokenizer = AutoTokenizer.from_pretrained(model_name)
+# # Load NER model
+# model_name = "../model/bert-large-cased-finetuned-conll03-english"
+# bert_tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-# Function for extract company name from NL
-def extract_company_names(text):
-    bert_model = AutoModelForTokenClassification.from_pretrained(model_name)
-    inputs = bert_tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
-    outputs = bert_model(**inputs)
-    predictions = torch.argmax(outputs.logits, dim=2)
-    tokens = bert_tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
-    entities = []
-    current_entity = []
-    prediction_labels = [bert_model.config.id2label[prediction] for prediction in predictions[0].numpy()]
-    for token, label in zip(tokens, prediction_labels):
-        if label == "B-ORG":
-            if current_entity:
-                entities.append(" ".join(current_entity))
-            current_entity = [token.replace("##", "")]
-        elif label == "I-ORG":
-            if token.startswith("##"):
-                current_entity[-1] += token.replace("##", "")
-            else:
-                current_entity.append(token)
-        elif current_entity:
-            entities.append(" ".join(current_entity))
-            current_entity = []
-    if current_entity:
-        entities.append(" ".join(current_entity))
-    return list(set(entities))
+# # Function for extract company name from NL
+# def extract_company_names(text):
+#     bert_model = AutoModelForTokenClassification.from_pretrained(model_name)
+#     inputs = bert_tokenizer(text, return_tensors="pt", truncation=True, max_length=512)
+#     outputs = bert_model(**inputs)
+#     predictions = torch.argmax(outputs.logits, dim=2)
+#     tokens = bert_tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
+#     entities = []
+#     current_entity = []
+#     prediction_labels = [bert_model.config.id2label[prediction] for prediction in predictions[0].numpy()]
+#     for token, label in zip(tokens, prediction_labels):
+#         if label == "B-ORG":
+#             if current_entity:
+#                 entities.append(" ".join(current_entity))
+#             current_entity = [token.replace("##", "")]
+#         elif label == "I-ORG":
+#             if token.startswith("##"):
+#                 current_entity[-1] += token.replace("##", "")
+#             else:
+#                 current_entity.append(token)
+#         elif current_entity:
+#             entities.append(" ".join(current_entity))
+#             current_entity = []
+#     if current_entity:
+#         entities.append(" ".join(current_entity))
+#     return list(set(entities))
 
 
 # Function for mapping company name to stock ticker
@@ -233,7 +234,8 @@ def handle_user_request(ticker):
 
 def process_user_query(input_text):
     # Extract company names from the input text
-    company_names = extract_company_names(input_text)
+    company_extractor = CompanyExtractor()
+    company_names = company_extractor.get_company_name(input_text)
 
     # Map extracted company names to their respective stock tickers
     if company_names:
@@ -386,7 +388,9 @@ def handle_news_request(company):
 
 def handle_full_request(input_text):
     # Step 1: Extract company name from user input
-    company_names = extract_company_names(input_text)
+    # company_names = extract_company_names(input_text)
+    company_name_extractor = CompanyExtractor()
+    company_names = company_name_extractor.get_company_name(input_text)  
     if not company_names:
         
         # return "No company identified. Please mention the company explicitly."
@@ -410,9 +414,11 @@ def handle_full_request(input_text):
     # Step 2: Fetch and display the stock data
     stock_data = fetch_recent_stock_data(company_ticker)
     
+    
     # Step 3: Fetch news, summarize, and perform sentiment analysis
-    news_file_path = f'../data/news_data/{company_name.lower()}.json'
+    news_file_path = f'../data/news_data/{company_name.split()[0].lower()}.json'
     news_result = summarize_and_analyze_news(news_file_path)
+    breakpoint()
     if "error" in news_result:
         return  {
         'stock_response': news_result["error"],
@@ -473,12 +479,12 @@ def generate_response(input_text):
         # return predefined_resp
 
     # extract and handle stock and news requests
-    company_names = extract_company_names(input_text)
-    print(company_names)
-    if company_names:
-        company_name = company_names[0] 
-        response = handle_full_request(company_name)
+    # company_names = extract_company_names(input_text)
+    # if company_names:
+        # company_name = company_names[0] 
+    try:
+        response = handle_full_request(input_text)
         return response
-
-    # Default response
-    return "Please enter any company name of your interest to find out current market trend."
+    except:
+        # Default response
+        return "Please enter any company name of your interest to find out current market trend."
